@@ -1,0 +1,7 @@
+*.*~
+*.pyc
+*.tex*
+*.html
+.idea
+.idea/*
+pfgutils/Settings.py

@@ -1,0 +1,7 @@
+Warning in <TInterpreter::ReadRootmapFile>: While processing /cvmfs/cms.cern.ch/el9_amd64_gcc12/cms/cmssw/CMSSW_14_1_0_pre4/lib/el9_amd64_gcc12/SimDataFormatsGeneratorProducts_xr.rootmap, class HepMC::FourVector was found to be associated to libSimDataFormatsGeneratorProducts.so although it is already associated to libHepMC3rootIO.so
+# WARNING: Cannot connect to Oracle database
+# WARNING: Cannot connect to ecalchannelstatus database
+usage: ghc.py [-h] [-c {oracle,files}] [-pon PON_RUNS] [-poff POFF_RUNS] [-tp TP_RUNS] [-l L_RUNS] [-lt TABLE] [-o DIRECTORY] [-r] [--csv] [-k]
+              [-f FORMAT] [-q] [-np] [--debug]
+              ghc
+ghc.py: error: argument -c/--dbstr: invalid choice: 'oracle://cms_ecal_r/***@cms_orcon_adg' (choose from 'oracle', 'files')

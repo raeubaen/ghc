@@ -1,0 +1,38 @@
+# connect parameters
+
+INT2R_LB =
+ (DESCRIPTION =
+   (ADDRESS = (PROTOCOL = TCP)(HOST = int2r1-v.cern.ch)(PORT = 10121))
+   (CONNECT_DATA =
+     (SERVER = DEDICATED)
+     (SERVICE_NAME = int2r_lb.cern.ch)
+   )
+ )
+
+CMS_OMDS_LB=(
+    DESCRIPTION=
+    (ADDRESS= (PROTOCOL=TCP) (HOST=cmsonr1-s.cern.ch) (PORT=10121) )
+    (ADDRESS= (PROTOCOL=TCP) (HOST=cmsonr2-s.cern.ch) (PORT=10121) )
+    (ADDRESS= (PROTOCOL=TCP) (HOST=cmsonr3-s.cern.ch) (PORT=10121) )
+    (ADDRESS= (PROTOCOL=TCP) (HOST=cmsonr4-s.cern.ch) (PORT=10121) )
+    (LOAD_BALANCE=on)
+    (ENABLE=BROKEN)
+    (CONNECT_DATA=
+        (SERVER=DEDICATED)
+        (SERVICE_NAME=cms_omds_lb.cern.ch)
+    )
+)
+
+cms_orcon_adg = 
+        (DESCRIPTION =
+           (ADDRESS = (PROTOCOL = TCP)(HOST = cmsonradg1-s.cern.ch)(PORT = 10121))
+           (ADDRESS = (PROTOCOL = TCP)(HOST = cmsonradg2-s.cern.ch)(PORT = 10121))
+           (LOAD_BALANCE = yes)
+           (ENABLE=BROKEN)
+           (CONNECT_DATA =
+               (SERVER = DEDICATED)
+               (SERVICE_NAME = cms_orcon_adg.cern.ch)
+                (FAILOVER_MODE=(TYPE = SELECT)(METHOD = BASIC)(RETRIES = 200)(DELAY = 15))
+           )
+      )
+

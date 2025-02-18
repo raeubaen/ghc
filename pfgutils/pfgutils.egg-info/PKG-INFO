@@ -1,0 +1,19 @@
+Metadata-Version: 2.2
+Name: pfgutils
+Version: 0.4
+Summary: Python module for ECAL PFG projects
+Home-page: https://gitlab.cern.ch/ECALPFG/pfgutils.git
+Author: Latyshev Grigory
+Author-email: glatyshe@cern.ch
+License: GPL
+Keywords: ecal postgresql database ROOT
+Requires: cx_Oracle
+Requires: requests
+Requires: ROOT
+Dynamic: author
+Dynamic: author-email
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: requires
+Dynamic: summary

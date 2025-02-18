@@ -1,0 +1,86 @@
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Helvetica Neue", Helvetica, "Liberation Sans", Calibri, Arial, sans-serif; /* Sans-serif headers */
+
+    /* font-family: "Liberation Serif", "Georgia", "Times New Roman", serif; /* Serif headers */
+
+    page-break-after: avoid; /* Firefox, Chrome, and Safari do not support the property value "avoid" */
+} 
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0; /* IE 6 */
+
+    /* border-bottom: 2pt solid #000; */
+    /* border-top: 2pt solid #000; */ /* The caption on top will not have a bottom-border */
+	border: 1px solid black;
+
+    /* Center */
+    margin-left: auto;
+    margin-right: auto; 
+}
+
+caption {
+	font-size:140%;
+	margin-bottom:15px
+}
+	
+thead /* Entire table header */ {
+    border-bottom: 1pt solid #000;
+    background-color: #eee; /* Does this BG print well? */
+}
+
+tr.header /* Each header row */ {
+} 
+
+tbody /* Entire table  body */ {
+}
+
+/* Table body rows */
+
+tr  {border: 1px solid black;}
+    
+/* Odd and even rows */
+tr.odd {}
+tr.even {background-color: LightGray;}
+
+td, th /* Table cells and table header cells */ { 
+    vertical-align: top; /* Word */
+    vertical-align: baseline; /* Others */
+    padding-left:   0.5em;
+    padding-right:  0.5em;
+    padding-top:    0.2em;
+    padding-bottom: 0.2em;
+	border: 1px solid black;
+}
+    
+th /* Table header cells */ {
+    font-weight: bold; 
+}
+
+tfoot /* Table footer (what appears here if caption is on top?) */ {
+}
+
+.added {	
+	background-color: DarkRed;
+}
+	
+.removed {
+	background-color: DarkGreen;
+}
+	
+.added_and_removed {
+	background-color: Gold;
+}
+	
+.healthy {
+	background-color: DarkBlue;
+	color: LightGray;
+}
+	
+.missed {
+	background-color: DarkMagenta;
+}
+
+.unchanged {
+	background-color: LightGray;
+}
