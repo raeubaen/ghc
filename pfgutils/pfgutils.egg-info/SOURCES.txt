@@ -1,6 +1,7 @@
 .gitignore
 README.md
 setup.py
+dist/pfgutils-0.4-py3.11.egg
 externals/install-externals.sh
 externals/source-all.sh
 pfgutils/Settings.py
@@ -13,6 +14,7 @@ pfgutils/constants.py
 pfgutils/ecalchannels.db
 pfgutils/ecalchannels.sql
 pfgutils/getrunlist.py
+pfgutils/ghc.log
 pfgutils/laser.py
 pfgutils/misc.py
 pfgutils/noise.py
