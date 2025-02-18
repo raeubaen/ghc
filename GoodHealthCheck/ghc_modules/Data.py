@@ -7,6 +7,8 @@ from collections import defaultdict
 
 from collections.abc import Iterable
 
+import sqlite3
+
 import psycopg2
 
 import pfgutils.connection
@@ -28,16 +30,21 @@ class Data(object):
   LASER_FLAGS = ['DLAMPL', 'SLAMPL', 'LLERRO']
 
   def __init__(self, ghc_id, keep):
-    self.dbh = psycopg2.connect(
+
+    self.dbh = conn = sqlite3.connect("database.db")
+
+    '''
+    psycopg2.connect(
       "host='{host}' dbname='ecalghc' user='{user}' password='{password}'".format(
         host=Settings.Database['options']['host'],
         user=Settings.Database['options']['user'],
         password=Settings.Database['options']['password'],
       ))
+    '''
 
     self.cur = self.dbh.cursor()
 
-    self.cur.execute("SELECT ghc FROM ghc WHERE ghc_id=%s", (ghc_id,))
+    self.cur.execute(f"SELECT ghc FROM ghc WHERE ghc_id={ghc_id}")
     res = self.cur.fetchone()
     if res is not None:
       self.ghc_id = res[0]
@@ -60,21 +67,22 @@ class Data(object):
     self.updateEcalChannelFlags()
 
   def updateEcalChannelFlags(self):
-    logger.info("Getting list of masked ecal channels")
-    dbhst = psycopg2.connect(
-      "host='{host}' dbname='ecalchannelstatus' user='{user}' password='{password}'".format(
-        host=Settings.Database['options']['host'],
-        user=Settings.Database['options']['user'],
-        password=Settings.Database['options']['password'],
-      ))
-
-    curst = dbhst.cursor()
-
-    curst.execute("SELECT dbid FROM ecalchannelstatus WHERE status > %s and \
-      iov = (select max(iov) from ecalchannelstatus) and tag=%s",
-                  (Settings.max_good_status, 'EcalChannelStatus_v1_hlt'))
-
-    self.masked_channels = tuple(c[0] for c in curst)
+#
+#    logger.info("Getting list of masked ecal channels")
+#    dbhst = psycopg2.connect(
+#      "host='{host}' dbname='ecalchannelstatus' user='{user}' password='{password}'".format(
+#        host=Settings.Database['options']['host'],
+#        user=Settings.Database['options']['user'],
+#        password=Settings.Database['options']['password'],
+#      ))
+#
+#    curst = dbhst.cursor()
+#
+#    curst.execute("SELECT dbid FROM ecalchannelstatus WHERE status > %s and \
+#      iov = (select max(iov) from ecalchannelstatus) and tag=%s",
+#                  (Settings.max_good_status, 'EcalChannelStatus_v1_hlt'))
+#
+    self.masked_channels = () #tuple(c[0] for c in curst)
 
   @staticmethod
   def getAllChannels(det='ALL'):

@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding=utf-8
+
+print("line0")
+
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
@@ -53,6 +56,8 @@ args = parser.parse_args()
 
 sys.argv = []
 
+print("here0")
+
 if args.output is None:
     args.output = args.ghc_id + ('_keep' if args.keep else '')
 
@@ -80,6 +85,8 @@ logger.setLevel(args.loglevel)
 
 ext = args.imgformat
 
+print("here1")
+
 if not args.output:
     outputdir = "RESULTS"
 else:
@@ -88,9 +95,10 @@ if not os.path.exists(outputdir):
     os.mkdir(outputdir)
 
 log_textile = codecs.open(os.path.join(outputdir, 'index.textile'), 'w', encoding='UTF-8')
+print("here2")
 
 header_count = {1: 0, 2: 0, 3: 0}
-
+print("here3")
 
 def header(text, level=1, name=None):
     header_count[level] += 1
@@ -105,6 +113,8 @@ def header(text, level=1, name=None):
 
 
 logging.info("GoodHealthCheck %s start", args.ghc_id)
+print("here4")
+
 GHC = Data.Data(args.ghc_id, args.keep)
 if args.redo > 0 and not GHC.can_redo:
     logging.critical("No data found for GHC %s, aborting", args.ghc_id)
