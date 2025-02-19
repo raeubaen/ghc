@@ -46,7 +46,7 @@ parser.add_argument('-k', "--keep-flagged", help="Keep channels with channeldb f
                     dest="keep", action="store_true")
 parser.add_argument('-f', "--format", help="Image format", dest='imgformat', default="png", metavar="FORMAT")
 parser.add_argument('-q', "--quiet", help="Don't print summary table with problematic channels", action="store_false",
-                    dest='verbose')
+                   dest='verbose')
 parser.add_argument('-np', '--no-plots', help="Don't make plots", action="store_true", dest='noplots')
 # TODO: Remove me when done
 # parser.add_argument('--expert-mode', help=argparse.SUPPRESS, action="store_true", dest='expert')
@@ -116,11 +116,14 @@ logging.info("GoodHealthCheck %s start", args.ghc_id)
 print("here4")
 
 GHC = Data.Data(args.ghc_id, args.keep)
+print('here5')
+
 if args.redo > 0 and not GHC.can_redo:
     logging.critical("No data found for GHC %s, aborting", args.ghc_id)
     exit(1)
 
 if args.redo is None:
+    print('here6')
     if args.dbstr == "files":
         logging.warning("The data will be read from files!")
     else:
@@ -133,7 +136,6 @@ if args.redo is None:
     if args.poff_runs is not None:
         logging.info("Pedestals with HV off...")
         GHC.readData(source, runs=args.poff_runs.split(), data_type="pedestal_hvoff")
-
     if args.tp_runs is not None:
         logging.info("Test pulse...")
         GHC.readData(source, runs=args.tp_runs.split(), data_type="testpulse")

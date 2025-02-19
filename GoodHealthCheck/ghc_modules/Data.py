@@ -30,7 +30,8 @@ class Data(object):
   LASER_FLAGS = ['DLAMPL', 'SLAMPL', 'LLERRO']
 
   def __init__(self, ghc_id, keep):
-
+    
+      
     self.dbh = conn = sqlite3.connect("database.db")
 
     '''
@@ -42,19 +43,21 @@ class Data(object):
       ))
     '''
 
-    self.cur = self.dbh.cursor()
-
-    self.cur.execute(f"SELECT ghc FROM ghc WHERE ghc_id={ghc_id}")
-    res = self.cur.fetchone()
-    if res is not None:
-      self.ghc_id = res[0]
-      self.can_redo = True
-    else:
-      self.cur.execute("INSERT INTO ghc (ghc_id) VALUES (%s)", (ghc_id,))
-      self.cur.execute("SELECT ghc FROM ghc WHERE ghc_id=%s", (ghc_id,))
-      self.ghc_id = self.cur.fetchone()[0]
-      self.can_redo = False
-      self.dbh.commit()
+#    self.cur = self.dbh.cursor()
+#
+#    self.cur.execute(f"SELECT ghc FROM ghc WHERE ghc_id={ghc_id}")
+#    res = self.cur.fetchone()
+#    if res is not None:
+#      self.ghc_id = res[0]
+#      self.can_redo = True
+#    else:
+#      self.cur.execute("INSERT INTO ghc (ghc_id) VALUES (%s)", (ghc_id,))
+#      self.cur.execute("SELECT ghc FROM ghc WHERE ghc_id=%s", (ghc_id,))
+#      self.ghc_id = self.cur.fetchone()[0]
+#      self.can_redo = False
+#      self.dbh.commit()
+#
+    self.can_redo = True
 
     self.keep_bad = keep
     self.masked_channels = None
@@ -590,6 +593,8 @@ class Data(object):
 
     logger.info("OK")
     logger.info("Exporting data from Oracle to local DB ...")
+    
+    print('BEGIN READING ORACLE')
 
     for gain_run in runs:
       if 'laser' not in data_type:
@@ -635,6 +640,9 @@ class Data(object):
       result = pfgutils.connection.oradbh.cursor().execute(sql, (iov,))
       cur.execute("INSERT INTO runs VALUES (%s, %s, %s, %s)", (self.ghc_id, run, data_type, gain))
       counter = 0
+
+    print('PRINTING TO TEXT FILE')
+
       for row in result:
         for k in range(len(fields)):
           cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s"
