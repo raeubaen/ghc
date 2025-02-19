@@ -118,7 +118,9 @@ print("here4")
 GHC = Data.Data(args.ghc_id, args.keep)
 print('here5')
 
-if args.redo > 0 and not GHC.can_redo:
+if not GHC.can_redo and (args.redo is not None):
+    print(GHC.can_redo)
+    print(args.redo)
     logging.critical("No data found for GHC %s, aborting", args.ghc_id)
     exit(1)
 
@@ -142,6 +144,11 @@ if args.redo is None:
     if args.l_runs is not None:
         logging.info("Laser...")
         GHC.readData(source, runs=args.l_runs.split(), data_type="laser", lasertable=args.lasertable)
+
+print('Stopping For Now. Data Read')
+exit(1)
+
+################################################
 
 if args.redo == 2:
     logging.warning("Channels will be reclassified")

@@ -57,6 +57,8 @@ class Data(object):
 #      self.can_redo = False
 #      self.dbh.commit()
 #
+    
+    self.ghc_id = ghc_id
     self.can_redo = True
 
     self.keep_bad = keep
@@ -146,7 +148,7 @@ class Data(object):
     :return: tuple
     """
     if datatype is not None and not self.have_datatype(datatype):
-      return tuple()
+        return tuple()
 
     return tuple(set(self.getAllChannels(det=det)) - set(self.getActiveChannels(det=det, datatype=datatype)))
 
@@ -638,19 +640,22 @@ class Data(object):
       cur.close()
       cur = self.dbh.cursor()
       result = pfgutils.connection.oradbh.cursor().execute(sql, (iov,))
-      cur.execute("INSERT INTO runs VALUES (%s, %s, %s, %s)", (self.ghc_id, run, data_type, gain))
-      counter = 0
-
+#      cur.execute("INSERT INTO runs VALUES (%s, %s, %s, %s)", (self.ghc_id, run, data_type, gain))
+     
     print('PRINTING TO TEXT FILE')
-
-      for row in result:
-        for k in range(len(fields)):
-          cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s"
-                      ", (SELECT keyid FROM valuekeys WHERE key=%(key)s), %(value)s)",
-                      {'ghc': self.ghc_id, 'dbid': row[0], 'key': fields[k], 'value': row[k + 1]})
-        counter += 1
-      logger.info("Exported {0} records".format(counter))
-      self.dbh.commit()
+    counter = 0
+    
+    with open('/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/test.txt', 'w') as f:
+        for row in result:
+            for k in range(len(fields)):
+               f.write(f'ghc: {self.ghc_id}, dbid: {row[0]}, key: {fields[k]}, value: {row[k + 1]}\n')
+                
+#            cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s"
+#                    ", (SELECT keyid FROM valuekeys WHERE key=%(key)s), %(value)s)",
+#                    {'ghc': self.ghc_id, 'dbid': row[0], 'key': fields[k], 'value': row[k + 1]})
+            counter += 1
+            logger.info("Exported {0} records".format(counter))
+            self.dbh.commit()
 
   def readDataFromFile(self, datatype, files):
     """
