@@ -14,8 +14,17 @@ import psycopg2
 import pfgutils.connection
 from pfgutils import Settings
 
+import pandas as pd
+
 # chdb = pfgutils.connection.ecalchannels
 # cur_chdb = chdb.cursor()
+
+
+# Load the CSV into a DataFrame    
+ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
+df = pd.read_csv(ecalchannels_path, header=None)
+    
+   
 
 logger = logging.getLogger()
 
@@ -32,34 +41,26 @@ class Data(object):
   def __init__(self, ghc_id, keep):
     
       
-    self.dbh = conn = sqlite3.connect("database.db")
+    self.dbh = conn = psycopg2.connect("postgresql://postgres:cp0psuvqQ7CBLYJE@db.yrugopcygvlzarsywqrp.supabase.co:5432/postgres")
 
-    '''
-    psycopg2.connect(
-      "host='{host}' dbname='ecalghc' user='{user}' password='{password}'".format(
-        host=Settings.Database['options']['host'],
-        user=Settings.Database['options']['user'],
-        password=Settings.Database['options']['password'],
-      ))
-    '''
+    self.cur = self.dbh.cursor()
 
-#    self.cur = self.dbh.cursor()
-#
-#    self.cur.execute(f"SELECT ghc FROM ghc WHERE ghc_id={ghc_id}")
-#    res = self.cur.fetchone()
-#    if res is not None:
-#      self.ghc_id = res[0]
-#      self.can_redo = True
-#    else:
-#      self.cur.execute("INSERT INTO ghc (ghc_id) VALUES (%s)", (ghc_id,))
-#      self.cur.execute("SELECT ghc FROM ghc WHERE ghc_id=%s", (ghc_id,))
-#      self.ghc_id = self.cur.fetchone()[0]
-#      self.can_redo = False
-#      self.dbh.commit()
-#
+    self.cur.execute(f"SELECT ghc FROM ghc WHERE ghc_id={ghc_id}")
+    res = self.cur.fetchone()
     
-    self.ghc_id = ghc_id
-    self.can_redo = True
+    if res is not None:
+      self.ghc_id = res[0]
+      self.can_redo = True
+    else:
+      self.cur.execute("INSERT INTO ghc (ghc_id) VALUES (%s)", (ghc_id,))
+      self.cur.execute("SELECT ghc FROM ghc WHERE ghc_id=%s", (ghc_id,))
+      self.ghc_id = self.cur.fetchone()[0]
+      self.can_redo = False
+      self.dbh.commit()
+
+    
+#    self.ghc_id = ghc_id
+#    self.can_redo = True
 
     self.keep_bad = keep
     self.masked_channels = None
@@ -94,19 +95,21 @@ class Data(object):
     """
       Return list of all channels
     """
-#    cur_chdb = pfgutils.connection.ecalchannels.cursor()
-#    if pfgutils.connection.ecalchannelsdb != "sqlite3":
-#        cur_chdb.execute("SELECT dbid FROM channels WHERE dbid::text  LIKE %s", (det_to_sql(det),))
-#    else:
-#        cur_chdb.execute("SELECT dbid FROM channels WHERE dbid LIKE ?", (det_to_sql(det),))
-#    return [c['dbid'] for c in cur_chdb]
-#
-######################################################################### 
+    # Get the 18th column (index 17) for channels
+    channels = df[17].astype(str)
+    
+    # Get the 27th column (index 26) for)
+    if len(det) == 2:
+        det_column = df[26].astype(str).str[:2]
+    else:
+        det_column = df[26].astype(str)
 
-
-
-
-
+    # Apply filter if det is not 'ALL'
+    if det != 'ALL':
+        channels = channels[det_column == det]
+    
+    # Convert the filtered series to a list
+    return channels.tolist()
 
 
   @staticmethod
@@ -114,12 +117,18 @@ class Data(object):
     """
       Return number of channels in a given subdetector
     """
-    cur_chdb = pfgutils.connection.ecalchannels.cursor()
-    if pfgutils.connection.ecalchannelsdb != "sqlite3":
-        cur_chdb.execute("SELECT COUNT(dbid) FROM channels WHERE dbid::text LIKE %s", (det_to_sql(det),))
+    # Get the 27th column 
+    if len(det) == 2:
+        det_column = df[26].astype(str).str[:2]
     else:
-        cur_chdb.execute("SELECT COUNT(dbid) FROM channels WHERE dbid LIKE ?", (det_to_sql(det),))
-    return list(cur_chdb.fetchone().values())[0]
+        det_column = df[26].astype(str)
+
+    # Apply filter and count
+    if det == 'ALL':
+        count = len(det_column)
+    else:
+        count = (det_column == det).sum()
+    return count
 
   @property
   def isClassified(self):
