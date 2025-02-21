@@ -94,12 +94,20 @@ class Data(object):
     """
       Return list of all channels
     """
-    cur_chdb = pfgutils.connection.ecalchannels.cursor()
-    if pfgutils.connection.ecalchannelsdb != "sqlite3":
-        cur_chdb.execute("SELECT dbid FROM channels WHERE dbid::text  LIKE %s", (det_to_sql(det),))
-    else:
-        cur_chdb.execute("SELECT dbid FROM channels WHERE dbid LIKE ?", (det_to_sql(det),))
-    return [c['dbid'] for c in cur_chdb]
+#    cur_chdb = pfgutils.connection.ecalchannels.cursor()
+#    if pfgutils.connection.ecalchannelsdb != "sqlite3":
+#        cur_chdb.execute("SELECT dbid FROM channels WHERE dbid::text  LIKE %s", (det_to_sql(det),))
+#    else:
+#        cur_chdb.execute("SELECT dbid FROM channels WHERE dbid LIKE ?", (det_to_sql(det),))
+#    return [c['dbid'] for c in cur_chdb]
+#
+######################################################################### 
+
+
+
+
+
+
 
   @staticmethod
   def getNumOfAllChannels(det='ALL'):
