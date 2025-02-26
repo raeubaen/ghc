@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 # coding=utf-8
-
-print("line0")
-
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
@@ -56,8 +53,6 @@ args = parser.parse_args()
 
 sys.argv = []
 
-print("here0")
-
 if args.output is None:
     args.output = args.ghc_id + ('_keep' if args.keep else '')
 
@@ -85,8 +80,6 @@ logger.setLevel(args.loglevel)
 
 ext = args.imgformat
 
-print("here1")
-
 if not args.output:
     outputdir = "RESULTS"
 else:
@@ -95,10 +88,8 @@ if not os.path.exists(outputdir):
     os.mkdir(outputdir)
 
 log_textile = codecs.open(os.path.join(outputdir, 'index.textile'), 'w', encoding='UTF-8')
-print("here2")
 
 header_count = {1: 0, 2: 0, 3: 0}
-print("here3")
 
 def header(text, level=1, name=None):
     header_count[level] += 1
@@ -113,10 +104,7 @@ def header(text, level=1, name=None):
 
 
 logging.info("GoodHealthCheck %s start", args.ghc_id)
-print("here4")
-
 GHC = Data.Data(args.ghc_id, args.keep)
-print('here5')
 
 if not GHC.can_redo and (args.redo is not None):
     print(GHC.can_redo)
@@ -125,7 +113,6 @@ if not GHC.can_redo and (args.redo is not None):
     exit(1)
 
 if args.redo is None:
-    print('here6')
     if args.dbstr == "files":
         logging.warning("The data will be read from files!")
     else:
@@ -134,6 +121,7 @@ if args.redo is None:
 
     if args.pon_runs is not None:
         logging.info("Pedestals with HV on...")
+        print('PED_HV')
         GHC.readData(source, runs=args.pon_runs.split(), data_type="pedestal_hvon")
     if args.poff_runs is not None:
         logging.info("Pedestals with HV off...")
@@ -145,15 +133,9 @@ if args.redo is None:
         logging.info("Laser...")
         GHC.readData(source, runs=args.l_runs.split(), data_type="laser", lasertable=args.lasertable)
 
-print('Stopping For Now. Data Read')
-exit(1)
-
-################################################
-
 if args.redo == 2:
     logging.warning("Channels will be reclassified")
     GHC.resetFlags()
-
 GHC.classifyChannels()
 
 logging.info("Creating report file")
@@ -162,8 +144,7 @@ print("", file=log_textile)
 
 if not args.keep:
     print("Channels with ecal channel status > {0} were removed. ".format(max_good_status), file=log_textile)
-    print("Click \"here\":../{0}_keep/report.html to view report with all channels in.".format(
-        args.ghc_id), file=log_textile)
+    print("Click \"here\":../{0}_keep/report.html to view report with all channels in.".format(args.ghc_id), file=log_textile)
     print("", file=log_textile)
 else:
     print("Channels with ecal channel status > {0} were kept. ".format(max_good_status), file=log_textile)

@@ -16,11 +16,11 @@ from pfgutils import Settings
 
 import pandas as pd
 
-# chdb = pfgutils.connection.ecalchannels
-# cur_chdb = chdb.cursor()
+## chdb = pfgutils.connection.ecalchannels
+## cur_chdb = chdb.cursor()
 
 
-# Load the CSV into a DataFrame    
+## Load the CSV into a DataFrame    
 ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
 df = pd.read_csv(ecalchannels_path, header=None)
     
@@ -52,15 +52,15 @@ class Data(object):
       self.ghc_id = res[0]
       self.can_redo = True
     else:
-      self.cur.execute("INSERT INTO ghc (ghc_id) VALUES (%s)", (ghc_id,))
+      self.cur.execute("INSERT INTO ghc (ghc_id, ghc, classified) VALUES (%s, %s, %s)", (1, 1, False))
       self.cur.execute("SELECT ghc FROM ghc WHERE ghc_id=%s", (ghc_id,))
       self.ghc_id = self.cur.fetchone()[0]
       self.can_redo = False
       self.dbh.commit()
 
     
-#    self.ghc_id = ghc_id
-#    self.can_redo = True
+##    self.ghc_id = ghc_id
+##    self.can_redo = True
 
     self.keep_bad = keep
     self.masked_channels = None
@@ -73,21 +73,21 @@ class Data(object):
     self.updateEcalChannelFlags()
 
   def updateEcalChannelFlags(self):
-#
-#    logger.info("Getting list of masked ecal channels")
-#    dbhst = psycopg2.connect(
-#      "host='{host}' dbname='ecalchannelstatus' user='{user}' password='{password}'".format(
-#        host=Settings.Database['options']['host'],
-#        user=Settings.Database['options']['user'],
-#        password=Settings.Database['options']['password'],
-#      ))
-#
-#    curst = dbhst.cursor()
-#
-#    curst.execute("SELECT dbid FROM ecalchannelstatus WHERE status > %s and \
-#      iov = (select max(iov) from ecalchannelstatus) and tag=%s",
-#                  (Settings.max_good_status, 'EcalChannelStatus_v1_hlt'))
-#
+##
+##    logger.info("Getting list of masked ecal channels")
+##    dbhst = psycopg2.connect(
+##      "host='{host}' dbname='ecalchannelstatus' user='{user}' password='{password}'".format(
+##        host=Settings.Database['options']['host'],
+##        user=Settings.Database['options']['user'],
+##        password=Settings.Database['options']['password'],
+##      ))
+##
+##    curst = dbhst.cursor()
+##
+##    curst.execute("SELECT dbid FROM ecalchannelstatus WHERE status > %s and \
+##      iov = (select max(iov) from ecalchannelstatus) and tag=%s",
+##                  (Settings.max_good_status, 'EcalChannelStatus_v1_hlt'))
+##
     self.masked_channels = () #tuple(c[0] for c in curst)
 
   @staticmethod
@@ -95,20 +95,20 @@ class Data(object):
     """
       Return list of all channels
     """
-    # Get the 18th column (index 17) for channels
+    ## Get the 18th column (index 17) for channels
     channels = df[17].astype(str)
     
-    # Get the 27th column (index 26) for)
+    ## Get the 27th column (index 26) for)
     if len(det) == 2:
         det_column = df[26].astype(str).str[:2]
     else:
         det_column = df[26].astype(str)
 
-    # Apply filter if det is not 'ALL'
+    ## Apply filter if det is not 'ALL'
     if det != 'ALL':
         channels = channels[det_column == det]
     
-    # Convert the filtered series to a list
+    ## Convert the filtered series to a list
     return channels.tolist()
 
 
@@ -117,13 +117,13 @@ class Data(object):
     """
       Return number of channels in a given subdetector
     """
-    # Get the 27th column 
+    ## Get the 27th column 
     if len(det) == 2:
         det_column = df[26].astype(str).str[:2]
     else:
         det_column = df[26].astype(str)
 
-    # Apply filter and count
+    ## Apply filter and count
     if det == 'ALL':
         count = len(det_column)
     else:
@@ -192,8 +192,8 @@ class Data(object):
     else:
       filter_sql = ""
 
-    # if not self.keep_bad:
-    #      filter_sql += " AND (SELECT status FROM channelstatus WHERE channelstatus.dbid = flags.dbid) < 3"
+    ## if not self.keep_bad:
+    ##      filter_sql += " AND (SELECT status FROM channelstatus WHERE channelstatus.dbid = flags.dbid) < 3"
 
     self.cur.execute(
       "SELECT DISTINCT flags.dbid FROM flags WHERE ghc=%(ghc)s {0} ORDER BY flags.dbid".format(filter_sql),
@@ -301,8 +301,8 @@ class Data(object):
         return None
     else:
       result = {}
-      for k in key:  # TODO: is this used?
-        # itertools.product(key):
+      for k in key:  ## TODO: is this used?
+        ## itertools.product(key):
         result[k] = self.getChannelData(k)
 
       return result
@@ -350,7 +350,7 @@ class Data(object):
 
     logger.info("Performing channel classification")
     self.dbh.commit()
-
+    
     def testpulse():
       for gain in ('G1', 'G6', 'G12'):
         sql = "INSERT INTO flags SELECT ghc, dbid, %s FROM \"values\" " \
@@ -378,11 +378,11 @@ class Data(object):
           self.cur.execute(sql, ('LTP' + gain, self.ghc_id, 'ADC_MEAN_' + gain, l))
 
     def ped_hvoff():
-      # pedestal HV OFF channels problems only for EB
+      ## pedestal HV OFF channels problems only for EB
       cur_on = self.dbh.cursor()
       cur_off = self.dbh.cursor()
       pre = "^[BD]P"
-      # Botjo checks only G12 RMS
+      ## Botjo checks only G12 RMS
       for gain in ["G12"]:
         data = defaultdict(lambda: [None, None])
         sql_on = "SELECT dbid, value FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) WHERE " \
@@ -400,8 +400,7 @@ class Data(object):
         badchannels = []
         for k, v in data.items():
           if v[0] is None or v[1] is None:
-            logger.info("Missing pedestal data for channel %d: PED_ON_RMS_G12 = %s, PED_OFF_RMS_G12 = %s",
-                        k, str(v[0]), str(v[1]))
+            logger.info("Missing pedestal data for channel %d: PED_ON_RMS_G12 = %s, PED_OFF_RMS_G12 = %s", k, str(v[0]), str(v[1]))
             continue
 
           if abs(v[0] - v[1]) < 0.2:
@@ -420,7 +419,7 @@ class Data(object):
           if isgood:
             # logger.debug("- Setting HV flag!")
             self.cur.execute("INSERT INTO flags VALUES (%s, %s, %s)", (self.ghc_id, c, 'BV' + gain))
-            # else:
+        # else:
             #   logger.debug("- Not setting HV flag")
 
     def laser():
@@ -460,6 +459,7 @@ class Data(object):
       for c in [k[0] for k in self.cur]:
         for f in self.getPedestalFlags(c):
           self.cur.execute("INSERT INTO flags VALUES (%s, %s, %s)", (self.ghc_id, c, f))
+            
       self.dbh.commit()
       logger.info("Finished.")
     except Exception as e:
@@ -501,9 +501,9 @@ class Data(object):
       logger.debug("Error details: ", exc_info=True)
       self.dbh.rollback()
       is_classified = False
-    # missed channels
+    ## missed channels
     logger.info("Try to find missed channels ...")
-    # pedestal hv on/off and testpulse
+    ## pedestal hv on/off and testpulse
     try:
       missed_channels = set()
       for t in ['pedestal_hvon', 'testpulse']:
@@ -561,7 +561,7 @@ class Data(object):
       verb = ' UNION '
 
     if det:
-      sql_det = " AND dbid::text LIKE %(det)s"  # .format(det_to_sql(det))
+      sql_det = " AND dbid::text LIKE %(det)s"  ## .format(det_to_sql(det))
       values['det'] = det_to_sql(det)
     else:
       sql_det = ""
@@ -601,7 +601,7 @@ class Data(object):
       return
     if lasertable:
       logger.info("Table {0} will be user as source for Laser data".format(lasertable))
-    # else:
+    ## else:
     if len(runs) == 1:
       runs = "G12:{0} G6:{0} G1:{0}".format(runs[0]).split()
 
@@ -613,8 +613,6 @@ class Data(object):
     logger.info("OK")
     logger.info("Exporting data from Oracle to local DB ...")
     
-    print('BEGIN READING ORACLE')
-
     for gain_run in runs:
       if 'laser' not in data_type:
         gain = gain_run.split(':')[0]
@@ -646,7 +644,7 @@ class Data(object):
         sql = "select LOGIC_ID, ADC_MEAN_{0}, ADC_RMS_{0} from MON_TEST_PULSE_DAT where IOV_ID=:1".format(gain)
         fields = [x + gain for x in ['ADC_MEAN_', 'ADC_RMS_']]
       elif "laser" in data_type:
-        # TODO: check keys in DB
+        ## TODO: check keys in DB
         sql = "select LOGIC_ID, APD_MEAN, APD_RMS, APD_OVER_PN_MEAN, APD_OVER_PN_RMS from {0} where IOV_ID=:1".format(lasertable)
         fields = ['APD_MEAN', 'APD_RMS', 'APD_OVER_PN_MEAN', 'APD_OVER_PN_RMS']
       else:
@@ -657,19 +655,17 @@ class Data(object):
       cur.close()
       cur = self.dbh.cursor()
       result = pfgutils.connection.oradbh.cursor().execute(sql, (iov,))
-#      cur.execute("INSERT INTO runs VALUES (%s, %s, %s, %s)", (self.ghc_id, run, data_type, gain))
+##      cur.execute("INSERT INTO runs VALUES (%s, %s, %s, %s)", (self.ghc_id, run, data_type, gain))
      
-    print('PRINTING TO TEXT FILE')
     counter = 0
     
-    with open('/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/test.txt', 'w') as f:
-        for row in result:
-            for k in range(len(fields)):
-               f.write(f'ghc: {self.ghc_id}, dbid: {row[0]}, key: {fields[k]}, value: {row[k + 1]}\n')
-                
-#            cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s"
-#                    ", (SELECT keyid FROM valuekeys WHERE key=%(key)s), %(value)s)",
-#                    {'ghc': self.ghc_id, 'dbid': row[0], 'key': fields[k], 'value': row[k + 1]})
+    #with open('/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/test.txt', 'w') as f:
+    for row in result:
+        for k in range(len(fields)):
+#               f.write(f'ghc: {self.ghc_id}, dbid: {row[0]}, key: {fields[k]}, value: {row[k + 1]}\n')
+            cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s"
+                    ", (SELECT keyid FROM valuekeys WHERE key=%(key)s), %(value)s)",
+                    {'ghc': self.ghc_id, 'dbid': row[0], 'key': fields[k], 'value': row[k + 1]})
             counter += 1
             logger.info("Exported {0} records".format(counter))
             self.dbh.commit()
@@ -725,7 +721,7 @@ class Data(object):
 
     for chid in self.getProblematicChannels():
       flags = self.getFlagsForChannel(chid)
-      # info = getChannelInfo(chid)
+      ## info = getChannelInfo(chid)
       if getSubDetector(chid) == 'EE':
         data = list(getXYZ(chid))
         data.extend([getDetSM(chid), getTT(chid)])
