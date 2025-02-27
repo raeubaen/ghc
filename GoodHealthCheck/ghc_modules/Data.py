@@ -15,7 +15,8 @@ import pfgutils.connection
 from pfgutils import Settings
 
 import pandas as pd
-
+import time
+from psycopg2.extras import execute_values
 ## chdb = pfgutils.connection.ecalchannels
 ## cur_chdb = chdb.cursor()
 
@@ -70,6 +71,7 @@ class Data(object):
     self._has_testpulse = None
     self._has_laser = None
 
+    self.channel_data_cache = {}
     self.updateEcalChannelFlags()
 
   def updateEcalChannelFlags(self):
@@ -268,8 +270,34 @@ class Data(object):
     self.cur.execute("DELETE FROM missed_channels WHERE ghc=%s", (self.ghc_id,))
     self.isClassified = False
     self.dbh.commit()
+  
+  def getAllChannelData(self, dbids):
+    """
+    Combine queries to get all relevant dbid and channel data in one go.
+    """
+    query = """
+        SELECT dbid, key, value 
+        FROM values 
+        INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid)
+        WHERE ghc = %s AND dbid IN %s AND key LIKE %s
+    """
+    self.cur.execute(query, (self.ghc_id, tuple(dbids), 'PED_ON_%'))
+    rows = self.cur.fetchall()
 
+    for dbid, key, value in rows:
+        if dbid not in self.channel_data_cache:
+            self.channel_data_cache[dbid] = {}
+        self.channel_data_cache[dbid][key] = value
+  
   def getChannelData(self, channel, key=None):
+    """
+    Optimized version of getChannelDataOld using cache
+    """
+    if channel in self.channel_data_cache:
+        return self.channel_data_cache[channel].get(key, None)
+    return None
+  
+  def getChannelDataOld(self, channel, key=None):
     """
       Returns channel's value for channels
       If additional keys ('key' and 'datatype') are specified -- return value
@@ -347,7 +375,7 @@ class Data(object):
     if self.isClassified:
       # logger.debug("Already classified.")
       return
-
+    #start = time.time()
     logger.info("Performing channel classification")
     self.dbh.commit()
     
@@ -454,12 +482,16 @@ class Data(object):
     logger.info("Classify Pedestal HV ON data ...")
     is_classified = True
     try:
-      self.cur.execute("SELECT DISTINCT dbid FROM values WHERE ghc = %s AND keyid::text LIKE %s",
-                       (self.ghc_id, '10__'))
-      for c in [k[0] for k in self.cur]:
+      self.cur.execute("SELECT DISTINCT dbid FROM values WHERE ghc = %s AND keyid::text LIKE %s", (self.ghc_id, '10__'))
+      flag_rows = []
+      dbids = [k[0] for k in self.cur]
+      self.getAllChannelData(dbids)        
+      for c in dbids:
         for f in self.getPedestalFlags(c):
-          self.cur.execute("INSERT INTO flags VALUES (%s, %s, %s)", (self.ghc_id, c, f))
-            
+          flag_rows.append((self.ghc_id, c, f))
+      if flag_rows:
+        insert_query = "INSERT INTO flags (ghc, dbid, flag) VALUES %s"
+        execute_values(self.cur, insert_query, flag_rows)
       self.dbh.commit()
       logger.info("Finished.")
     except Exception as e:
@@ -538,6 +570,7 @@ class Data(object):
       logger.info("NOT ALL SELECTION CRITERIA ARE USED FOR DATA CLASSIFICATION")
     self.isClassified = True
     self.dbh.commit()
+    #print(f'Tot time: {time.time() - start})')
 
   def getFlagsForChannel(self, channel):
     if self.isMasked(channel):
