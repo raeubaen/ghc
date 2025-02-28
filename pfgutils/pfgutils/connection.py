@@ -10,63 +10,119 @@ import pandas as pd
 
 dqms = {'online': DQMURLProvider("online"), "offline": DQMURLProvider("offline")}
 
+ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
+pickle_file = '/afs/cern.ch/user/c/charlesf/ghc/pfgutils/pfgutils/ch_dict.pkl'
+
 try:
   import cx_Oracle
 except ImportError:
   logging.warning("Oracle module not available!")
   cx_Oracle = None
   oradbh = None
-else:
-  #os.environ['TNS_ADMIN'] = os.path.dirname(os.path.abspath(__file__))
-  """:type: cx_Oracle.Connection"""
-  try:
-    dsn = cx_Oracle.makedsn("127.0.0.1", 10121, service_name=Settings.Oracle['SID'])
-    oradbh = cx_Oracle.connect(user=Settings.Oracle['user'], password=Settings.Oracle['password'], dsn=dsn, encoding="UTF-8")
-    print("ORACLE CONNECTED")
-  except:
-    logging.warning("Cannot connect to Oracle database")
-    oradbh = None
 
+class Connection:
 
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
+    _instance = None
+    _oradbh = None
+    _ecalchannels = None
 
-ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
-ecalch_df = pd.read_csv(ecalchannels_path, header=None)
+    def __new__(cls):
+        """Singleton connection class creation"""
+        if cls._instance is None:
+            cls._instance = super(Connection, cls).__new__(cls)    
 
-pickle_file = '/afs/cern.ch/user/c/charlesf/ghc/pfgutils/pfgutils/ch_dict.pkl'
-channel_dict = None
+            if cx_Oracle:    
+                try:
+                    """:type: cx_Oracle.Connection"""
+                    dsn = cx_Oracle.makedsn("127.0.0.1", 10121, service_name=Settings.Oracle['SID'])
+                    cls._instance._oradbh = cx_Oracle.connect(user=Settings.Oracle['user'], password=Settings.Oracle['password'], dsn=dsn, encoding="UTF-8")
+                    print("ORACLE CONNECTED")
+                except:
+                    logging.warning("Cannot connect to Oracle database")
+                    cls._instance._oradbh = None
 
-def loadChDict():   
-    global channel_dict
-
-    if channel_dict is not None:
-        return channel_dict
-
-    if not os.path.exists(pickle_file):
-        ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
-        df = pd.read_csv(ecalchannels_path, header=0)
-        df.columns = df.columns.map(str)
-        dbid_col = df.columns[17]
-        df.set_index(dbid_col, inplace=True)
-        channel_dict = df.to_dict(orient='index')
-
-        with open(pickle_file, 'wb') as f:
-            pickle.dump(channel_dict, f)
-    else:
-        with open(pickle_file, 'rb') as f:
-            channel_dict = pickle.load(f)
+                try:
+                    """:type: ecalchannels.Connection """
+                    if not os.path.exists(pickle_file):
+                        df  = pd.read_csv(ecalchannels_path, header=None)
+                        df.columns = df.columns.map(str)
+                        dbid_col = df.columns[17]
+                        df.set_index(dbid_col, inplace=True)
+                        cls._instance._ecalchannels = df.to_dict(orient='index')
+                        with open(pickle_file, 'wb') as f:
+                            pickle.dump(cls._instance._ecalchannels, f)
+                    else:
+                        with open(pickle_file, 'rb') as f:
+                            cls._instance._ecalchannels = pickle.load(f)
+                    print("ECAL CHANNELS CONNECTED")
+                except:
+                    logging.warning("Cannot connect to EcalChannels CSV")
+                    cls._instance._ecalchannels = None
+                
+        return cls._instance
     
+    def getChDict(self, c):
+        return self._ecalchannels.get(c, None)
 
-    return channel_dict
-
-def getChDict(c):
-    ch_dict = loadChDict()
-    return ch_dict.get(c, None)
-
+     
+#try:
+#  import cx_Oracle
+#except ImportError:
+#  logging.warning("Oracle module not available!")
+#  cx_Oracle = None
+#  oradbh = None
+#else:
+#  #os.environ['TNS_ADMIN'] = os.path.dirname(os.path.abspath(__file__))
+#  """:type: cx_Oracle.Connection"""
+#  try:
+#    dsn = cx_Oracle.makedsn("127.0.0.1", 10121, service_name=Settings.Oracle['SID'])
+#    oradbh = cx_Oracle.connect(user=Settings.Oracle['user'], password=Settings.Oracle['password'], dsn=dsn, encoding="UTF-8")
+#    print("ORACLE CONNECTED")
+#  except:
+#    logging.warning("Cannot connect to Oracle database")
+#    oradbh = None
+#
+#
+#def dict_factory(cursor, row):
+#    d = {}
+#    for idx, col in enumerate(cursor.description):
+#        d[col[0]] = row[idx]
+#    return d
+#
+#ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
+#ecalch_df = pd.read_csv(ecalchannels_path, header=None)
+#
+#pickle_file = '/afs/cern.ch/user/c/charlesf/ghc/pfgutils/pfgutils/ch_dict.pkl'
+#
+#channel_dict = None
+#
+#def loadChDict():   
+#    global channel_dict
+#
+#    if channel_dict is not None:
+#        return channel_dict
+#
+#    if not os.path.exists(pickle_file):
+#        ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
+#        df = pd.read_csv(ecalchannels_path, header=0)
+#        df.columns = df.columns.map(str)
+#        dbid_col = df.columns[17]
+#        df.set_index(dbid_col, inplace=True)
+#        channel_dict = df.to_dict(orient='index')
+#
+#        with open(pickle_file, 'wb') as f:
+#            pickle.dump(channel_dict, f)
+#    else:
+#        with open(pickle_file, 'rb') as f:
+#            channel_dict = pickle.load(f)
+#    
+#
+#    return channel_dict
+#
+#def getChDict(c):
+#    ch_dict = loadChDict()
+#    return ch_dict.get(c, None)
+#
 #ecalchannels = sqlite3.connect(os.path.join(os.path.dirname(__file__), "ecalchannels.db"))
 #ecalchannels.row_factory = dict_factory
 #

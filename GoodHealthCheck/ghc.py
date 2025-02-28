@@ -491,7 +491,6 @@ if args.verbose:
 
 # if args.verbose: or args.expert:
     print("p. \"Summary of all channels with flags\":flags.html\n", file=log_textile)
-
 if args.csv:
     logging.info("Creating CSV file")
     with open("ghc_{0}_r.csv".format(args.ghc_id), "w") as f:
@@ -506,7 +505,7 @@ if not args.noplots:
         if not os.path.exists(outputdir + "/" + subdir):
             os.mkdir(outputdir + "/" + subdir)
 
-    for plottype in ('mean', 'RMS'):
+    for plottype in ('MEAN', 'RMS'):
         for g in ("G1", "G6", "G12"):
             for d in ("EB", "EE"):
                 ### 1D plots

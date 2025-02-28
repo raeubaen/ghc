@@ -127,9 +127,9 @@ def getHistsDbIds(data):
 
 def getCanvasHistDbIds(data):
   # data has 'value' = ((dbid, value), (dbid, value), ...)
-  from pfgutils.connection import ecalchannels
+  import pfgutils.connection as conn
+  c = conn.Connection()
   from copy import deepcopy
-  cur = ecalchannels.cursor()
   if 'values' not in data:
     logging.warning("Key 'values' not found in data")
     return None
@@ -145,17 +145,18 @@ def getCanvasHistDbIds(data):
   #   channels[row[0]] = row[1:]
   for dbid, value in data['values']:
     # det, ix, iy, iz, iphi, ieta = channels[dbid]
-    cur.execute("SELECT ieta, iphi, ix, iy, iz, det FROM channels WHERE dbId = ?", (dbid,))
-    data = cur.fetchone()
-    if 'EB' in data['det']:
+    #cur.execute("SELECT ieta, iphi, ix, iy, iz, det FROM channels WHERE dbId = ?", (dbid,))
+    #data = [c.getChDict(dbid)[x] for x in [ieta, iphi, ix, iy, iz, det]]
+    #data = cur.fetchone()
+    if 'EB' in c.getChDict(dbid)['det']:
       key = 'eb'
-      x, y = data['iphi'], data['ieta']
-    elif 'EE+' in data['det']:
+      x, y = c.getChDict(dbid)['iphi'], c.getChDict(dbid)['ieta']
+    elif 'EE+' in c.getChDict(dbid)['det']:
       key = 'ee+'
-      x, y = data['ix'], data['iy']
-    elif 'EE-' in data['det']:
+      x, y = c.getChDict(dbid)['ix'], c.getChDict(dbid)['iy']
+    elif 'EE-' in c.getChDict(dbid)['det']:
       key = 'ee-'
-      x, y = data['ix'], data['iy']
+      x, y = c.getChDict(dbid)['ix'], c.getChDict(dbid)['iy']
     else:
       return
     newdata[key].append(((x, y), value))

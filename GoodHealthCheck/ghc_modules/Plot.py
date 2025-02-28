@@ -21,7 +21,10 @@ class Plotter(object):
     use_rms = 'RMS' in key
 
     activech = self.data.getActiveChannels(key, det=det)
-
+    if not activech:
+      logging.warning("empty list of active channels")
+      return None
+    self.data.getAllChannelData()###FIND GOOD SPOT TO CALL ONCE
     if dimx is None:
       if key.startswith('ADC'):
         if det == "EB":
@@ -90,6 +93,11 @@ class Plotter(object):
       lim['eb'] = {True: {"Laser": (0, 50), 'APD/PN': (0, 0.06)}, False: {"Laser": (0, 2000), 'APD/PN': (0, 3)}}
 
     activech = self.data.getActiveChannels(key)
+
+    if not activech:
+      logging.warning("empty list of active channels")
+      return 
+    self.data.getAllChannelData()
     hist = {'name': name, 'title': name, 'values': [],
             'minimum': {'ee-': lim['ee'][use_rms][gain][0], 'ee+': lim['ee'][use_rms][gain][0],
                         'eb': lim['eb'][use_rms][gain][0]},
@@ -136,6 +144,8 @@ class Plotter(object):
         #     for i in lines:
         #         i.Draw()
         #     getEENumbers()
+      if not histogram:
+        return
       else:
         c = ROOT.TCanvas()
         c.SetLogy()

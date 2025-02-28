@@ -20,7 +20,6 @@ from psycopg2.extras import execute_values
 ## chdb = pfgutils.connection.ecalchannels
 ## cur_chdb = chdb.cursor()
 
-
 ## Load the CSV into a DataFrame    
 ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
 df = pd.read_csv(ecalchannels_path, header=None)
@@ -72,7 +71,9 @@ class Data(object):
     self._has_laser = None
 
     self.channel_data_cache = {}
+    self.channel_flag_cache = {}
     self.updateEcalChannelFlags()
+    self.valuekeysDict = self.valuekeysDict()
 
   def updateEcalChannelFlags(self):
 ##
@@ -92,25 +93,37 @@ class Data(object):
 ##
     self.masked_channels = () #tuple(c[0] for c in curst)
 
+  def valuekeysDict(self, reverse=False):
+    """
+      Return valuekeys dictionary
+    """
+    valuekeysDict = {}
+    if not reverse:
+      with open(r'/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/VALUEKEYS.txt', 'r') as f:
+        for line in f:
+          valuekeysDict[line.strip().split()[0]] = line.strip().split()[1] 
+    else:
+      with open(r'/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/VALUEKEYS.txt', 'r') as f:
+        for line in f:
+          valuekeysDict[line.strip().split()[1]] = line.strip().split()[0] 
+    return valuekeysDict 
+
+#MAYBE REWRITE TO ALLIGN WITH CONNECTION CLASS?
   @staticmethod
   def getAllChannels(det='ALL'):
     """
       Return list of all channels
     """
-    ## Get the 18th column (index 17) for channels
     channels = df[17].astype(str)
     
-    ## Get the 27th column (index 26) for)
     if len(det) == 2:
         det_column = df[26].astype(str).str[:2]
     else:
         det_column = df[26].astype(str)
 
-    ## Apply filter if det is not 'ALL'
     if det != 'ALL':
         channels = channels[det_column == det]
     
-    ## Convert the filtered series to a list
     return channels.tolist()
 
 
@@ -119,13 +132,11 @@ class Data(object):
     """
       Return number of channels in a given subdetector
     """
-    ## Get the 27th column 
     if len(det) == 2:
         det_column = df[26].astype(str).str[:2]
     else:
         det_column = df[26].astype(str)
 
-    ## Apply filter and count
     if det == 'ALL':
         count = len(det_column)
     else:
@@ -196,11 +207,9 @@ class Data(object):
 
     ## if not self.keep_bad:
     ##      filter_sql += " AND (SELECT status FROM channelstatus WHERE channelstatus.dbid = flags.dbid) < 3"
-
     self.cur.execute(
       "SELECT DISTINCT flags.dbid FROM flags WHERE ghc=%(ghc)s {0} ORDER BY flags.dbid".format(filter_sql),
       {'ghc': self.ghc_id})
-
     return [c[0] for c in self.cur if not self.isMasked(c[0])]
 
   def getNumOfProblematicChannels(self, without_missing=False):
@@ -225,11 +234,12 @@ class Data(object):
       datatype = ['PED_OFF_MEAN%', 'PED_ON_MEAN%', 'ADC_MEAN%', 'APD_MEAN%']
 
     if is_iterable(datatype):
+      ###############################################THIS SHIT BROKEN
       sql_items = []
       values = {'ghc': self.ghc_id, 'det': det_to_sql(det)}
       for i, d in enumerate(datatype):
-        sql_items.append("key LIKE %(datatype{0})s".format(i))
-        values['datatype{0}'.format(i)] = d
+        sql_items.append("values.keyid::text LIKE %(datatype{0})s".format(i))
+        values['datatype{0}'.format(i)] = self.valuekeysDict[d]
 
       sql = "SELECT DISTINCT dbid FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) " \
             "WHERE ghc=%(ghc)s AND ({0}) AND dbid::text LIKE %(det)s".format(" OR ".join(sql_items))
@@ -238,8 +248,8 @@ class Data(object):
     else:
       sql = self.cur.mogrify(
         "SELECT DISTINCT dbid FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) "
-        "WHERE ghc=%(ghc)s AND key LIKE %(datatype)s AND dbid::text LIKE %(det)s",
-        {'ghc': self.ghc_id, 'datatype': datatype, 'det': det_to_sql(det)})
+        "WHERE ghc=%(ghc)s AND values.keyid::text LIKE %(datatype)s AND dbid::text LIKE %(det)s",
+        {'ghc': self.ghc_id, 'datatype': self.valuekeysDict[datatype], 'det': det_to_sql(det)})
       # logger.debug("getActiveChannels: %s", sql)
       self.cur.execute(sql)
     return [c[0] for c in self.cur if not self.isMasked(c[0])]
@@ -271,17 +281,19 @@ class Data(object):
     self.isClassified = False
     self.dbh.commit()
   
-  def getAllChannelData(self, dbids):
+  def getAllChannelData(self):
     """
     Combine queries to get all relevant dbid and channel data in one go.
     """
+    if self.channel_data_cache:
+        return 
     query = """
         SELECT dbid, key, value 
         FROM values 
         INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid)
-        WHERE ghc = %s AND dbid IN %s AND key LIKE %s
+        WHERE ghc = %s 
     """
-    self.cur.execute(query, (self.ghc_id, tuple(dbids), 'PED_ON_%'))
+    self.cur.execute(query, (self.ghc_id,))
     rows = self.cur.fetchall()
 
     for dbid, key, value in rows:
@@ -485,7 +497,7 @@ class Data(object):
       self.cur.execute("SELECT DISTINCT dbid FROM values WHERE ghc = %s AND keyid::text LIKE %s", (self.ghc_id, '10__'))
       flag_rows = []
       dbids = [k[0] for k in self.cur]
-      self.getAllChannelData(dbids)        
+      self.getAllChannelData()        
       for c in dbids:
         for f in self.getPedestalFlags(c):
           flag_rows.append((self.ghc_id, c, f))
@@ -570,16 +582,27 @@ class Data(object):
       logger.info("NOT ALL SELECTION CRITERIA ARE USED FOR DATA CLASSIFICATION")
     self.isClassified = True
     self.dbh.commit()
-    #print(f'Tot time: {time.time() - start})')
+
+  def getFlagsForAllChannels(self):
+    ##CACHE FLAG FOR 'ALL' METHODS AND MAYBE CALL IN __init__##
+    self.classifyChannels()
+    query = "SELECT * FROM flags WHERE ghc = %s"
+    
+    self.cur.execute(query, (self.ghc_id,))
+    rows = self.cur.fetchall()
+    for ghc, dbid, flag in rows:
+        if dbid not in self.channel_flag_cache:
+            self.channel_flag_cache[dbid] = list()
+        self.channel_flag_cache[dbid].append(flag)
+ 
 
   def getFlagsForChannel(self, channel):
     if self.isMasked(channel):
       return []
-
-    self.classifyChannels()
-    self.cur.execute("SELECT flag FROM flags WHERE ghc = %s AND dbid = %s", (self.ghc_id, int(channel)))
-    return [f[0] for f in self.cur]
-
+    ##################################CLASSIFY ONCE ON OBJECT CREATION MAYBE????
+    #self.classifyChannels()
+    channel = int(channel)
+    return self.channel_flag_cache.get(channel, [])
   def getChannelsWithFlag(self, flags, exp="and", det=None):
     """
       Returns list of channels which has <flags> (string|list)
@@ -639,7 +662,8 @@ class Data(object):
       runs = "G12:{0} G6:{0} G1:{0}".format(runs[0]).split()
 
     logger.info("Trying to connect to Oracle")
-    if pfgutils.connection.oradbh is None:
+    c = pfgutils.connection.Connection()
+    if c._oradbh is None:
       logger.error("Requested source (Oracle) is not available!")
       return
 
@@ -656,7 +680,7 @@ class Data(object):
         gain = ""
         logger.info("Process {1} run {0} ...".format(run, data_type))
 
-      cur = pfgutils.connection.oradbh.cursor()
+      cur = c._oradbh.cursor()
       res = cur.execute(
         "SELECT IOV_ID from MON_RUN_IOV where RUN_IOV_ID=(select IOV_ID from RUN_IOV where RUN_NUM=:1)",
         (run,)).fetchone()
@@ -687,12 +711,13 @@ class Data(object):
 
       cur.close()
       cur = self.dbh.cursor()
-      result = pfgutils.connection.oradbh.cursor().execute(sql, (iov,))
+      result = c._oradbh.cursor().execute(sql, (iov,))
 ##      cur.execute("INSERT INTO runs VALUES (%s, %s, %s, %s)", (self.ghc_id, run, data_type, gain))
      
     counter = 0
-    
-    #with open('/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/test.txt', 'w') as f:
+###############################
+#  OPTIMIZE WITH BULK INSERT  #
+############################### 
     for row in result:
         for k in range(len(fields)):
 #               f.write(f'ghc: {self.ghc_id}, dbid: {row[0]}, key: {fields[k]}, value: {row[k + 1]}\n')
@@ -751,7 +776,7 @@ class Data(object):
     print(" {0:^10s} | {2:^30s} | {1:^40s}".format("channel", "coordinates", "flags"), file=ostream)
     if output is None:
       print("-" * 80, file=ostream)
-
+    self.getFlagsForAllChannels() #MAYBE RELOCATE????
     for chid in self.getProblematicChannels():
       flags = self.getFlagsForChannel(chid)
       ## info = getChannelInfo(chid)
@@ -774,8 +799,12 @@ class Data(object):
     """
     ostream = output or sys.stdout
     print("|_. {0:^10s} |_\\2. {2:^30s} |_. {1:^40s} |".format("Channel ID", "Flags", "Info"), file=ostream)
+
+    self.getFlagsForAllChannels() #MAYBE RELOCATE????
+ 
     for chid in self.getProblematicChannels():
       flags = self.getFlagsForChannel(chid)
+      
       if getSubDetector(chid) == 'EE':
         data = list(getXYZ(chid))
         data.extend([getDetSM(chid), getTT(chid)])
@@ -784,7 +813,7 @@ class Data(object):
         data = list(getEtaPhi(chid))
         data.extend([getDetSM(chid), getTT(chid)])
         coord = "iEta={0:+2d} iPhi={1:3d} | {2:5s} TT{3:2d}".format(*data)
-
+        
       print("| {0:10d} | {2:30s} | {1:40s} |".format(chid, "+".join(flags), coord), file=ostream)
 
   # def getchnum(self, d, x):
@@ -868,8 +897,9 @@ def getChannelInfo(c):
     keys for EB: id, location, SM, TT, iEta, iPhi
     keys for EE: id, location, SM, Dee, iX, iY, iZ
   """
+  c = pfgutils.connection.Connection()
   info = {'id': c}
-  info.update(pfgutils.connection.getChDict(c))
+  info.update(c.getChDict(c))
   return info
 
 
@@ -884,36 +914,42 @@ def getTT(channel):
   """
     Returns TT number for channel
   """
-  return pfgutils.connection.getChDict(channel)['tower']
+  c = pfgutils.connection.Connection()
+  return c.getChDict(channel)['tower']
 
 
 def getCCU(channel):
-  return pfgutils.connection.getChDict(channel)['ccu']
+  c = pfgutils.connection.Connection()
+  return c.getChDict(channel)['ccu']
 
 
 def getXtal(channel):
   """
     Returns crystal number for channel
   """
-  return pfgutils.connection.getChDict(channel)['xtalinccu']
+  c = pfgutils.connection.Connection()
+  return c.getChDict(channel)['xtalinccu']
 
 
 def getDetSM(channel):
-  return pfgutils.connection.getChDict(channel)['det']
+  c = pfgutils.connection.Connection()
+  return c.getChDict(channel)['det']
 
 
 def getSM(channel):
   """
     Returns SM number for EB channel
   """
-  return pfgutils.connection.getChDict(channel)['det'][2:]
+  c = pfgutils.connection.Connection()
+  return c.getChDict(channel)['det'][2:]
 
 
 def getEtaPhi(channel):
   """
     Return (Eta, Phi) tuple for EB channels
   """
-  r = pfgutils.connection.getChDict(channel)
+  c = pfgutils.connection.Connection()
+  r = c.getChDict(channel)
   return r['ieta'], r['iphi']
 
 
@@ -921,7 +957,8 @@ def getEtaPhiBin(channel):
   """
     Return (Eta, Phi) tuple for EB channels
   """
-  r = pfgutils.connection.getChDict(channel)
+  c = pfgutils.connection.Connection()
+  r = c.getChDict(channel)
   return r['ieta'] + 86, r['iphi']
 
 
@@ -929,7 +966,8 @@ def getXYZ(channel):
   """
     Return (x, y , -1|1 ) tuple for EE channels
   """
-  r = pfgutils.connection.getChDict(channel)
+  c = pfgutils.connection.Connection()
+  r = c.getChDict(channel)
   return r['ix'], r['iy'], r['iz']
 
 
@@ -937,7 +975,8 @@ def getSubDetector(channel):
   """
     Returns EB|EE detector place of channel
   """
-  return pfgutils.connection.getChDict(channel)['det'][:2]
+  c = pfgutils.connection.Connection()
+  return c.getChDict(channel)['det'][:2]
 
 
 def det_to_sql(det):

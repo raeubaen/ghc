@@ -1,0 +1,825 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="../ghc.css" type="text/css" />
+  <!-- SortTable, by Stuart Langridge, http://www.kryogenix.org/code/browser/sorttable/ -->
+  <script src="../sorttable.js"></script>
+  <!-- MathJAX -->
+  <script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+<body>
+	<p><div id="toc"><h2> Table of Contents </h2></p>
+
+	<ul>
+		<li><a href="#h2_1">Runs</a></li>
+	</ul></li>
+	<ul>
+		<li><a href="#h1_2"><span class="caps">PEDESTAL</span> <span class="caps">ANALYSIS</span></a>
+	<ul>
+		<li><a href="#h2_2"><span class="caps">PEDESTAL</span> EB <span class="caps">ANALYSIS</span></a>
+	<ul>
+		<li><a href="#h3_1">Plots</a></li>
+	</ul></li>
+		<li><a href="#h2_3"><span class="caps">PEDESTAL</span> EE <span class="caps">ANALYSIS</span></a>
+	<ul>
+		<li><a href="#h3_2">Plots</a></li>
+	</ul></li>
+		<li><a href="#h2_4">Pedestal maps</a></li>
+	</ul></li>
+		<li><a href="#h1_3"><span class="caps">TEST</span> <span class="caps">PULSE</span> <span class="caps">ANALYSIS</span></a></li>
+		<li><a href="#h1_4"><span class="caps">LASER</span> <span class="caps">ANALYSIS</span></a></li>
+		<li><a href="#h1_5">Problematic Channels Summary for EB</a></li>
+		<li><a href="#h1_6">Problematic Channels Summary for EE</a></li>
+		<li><a href="#h1_7">Description of errors</a><br />
+</div></li>
+	</ul>	<h1 style="text-align: center;">GoodHealthCheck #1 <a name="top"/></h1>
+
+	<p>Channels with ecal channel status > 3 were kept. <br />
+Click <a href="../1/report.html">here</a> to view report without these channels.</p>
+
+	<h2>Runs <a name="h2_1"/> <a href="#top">↑</a></h2>
+
+	<table>
+		<tr>
+			<th>Run type </th>
+			<th>Gain 1 </th>
+			<th>Gain 6 </th>
+			<th>Gain 12 </th>
+		</tr>
+		<tr>
+			<td> Pedestals, HV on </td>
+			<td> &#8211; </td>
+			<td> &#8211; </td>
+			<td> &#8211; </td>
+		</tr>
+		<tr>
+			<td> Pedestals, HV off </td>
+			<td> &#8211; </td>
+			<td> &#8211; </td>
+			<td> &#8211; </td>
+		</tr>
+		<tr>
+			<td> Test pulse </td>
+			<td> &#8211; </td>
+			<td> &#8211; </td>
+			<td> &#8211; </td>
+		</tr>
+	</table>
+
+	<h1><span class="caps">PEDESTAL</span> <span class="caps">ANALYSIS</span> <a name="h1_2"/> <a href="#top">↑</a></h1>
+
+	<h2><span class="caps">PEDESTAL</span> EB <span class="caps">ANALYSIS</span> <a name="h2_2"/> <a href="#top">↑</a></h2>
+
+	<table>
+	<caption>Channel statistics (EB)</caption>
+	<colgroup span="4" width="150">
+	<col width="180" />
+	</colgroup>
+		<tr>
+			<th>&nbsp; </th>
+			<th>Gain 1 </th>
+			<th>Gain 6 </th>
+			<th>Gain 12 </th>
+		</tr>
+		<tr>
+			<td> Missing channels </td>
+			<td> 61200 </td>
+			<td> 61200 </td>
+			<td> 459 </td>
+		</tr>
+		<tr>
+			<td> Active  channels </td>
+			<td> 0 </td>
+			<td> 0 </td>
+			<td> 60741 </td>
+		</tr>
+	</table>
+
+	<table>
+	<caption>Classes of pedestal problematic channels</caption>
+		<tr>
+			<th>&nbsp;                                    </th>
+			<th>Count </th>
+			<th>Short name            </th>
+		</tr>
+		<tr>
+			<td> Dead pedestal channels                      </td>
+			<td>     0 </td>
+			<td> <span class="caps">DPG</span>1                    </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean outside [170,230]             </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>1                    </td>
+		</tr>
+		<tr>
+			<td> Large <span class="caps">RMS</span> (noisy channels)                  </td>
+			<td>     0 </td>
+			<td> <span class="caps">LRG</span>1                    </td>
+		</tr>
+		<tr>
+			<td> Very large <span class="caps">RMS</span> (very noisy channels)        </td>
+			<td>     0 </td>
+			<td> <span class="caps">VLRG</span>1                   </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and noisy channels             </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>1+LRG1               </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and very noisy                 </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>1+VLRG1              </td>
+		</tr>
+		<tr>
+			<td> Dead pedestal channels                      </td>
+			<td>     0 </td>
+			<td> <span class="caps">DPG</span>6                    </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean outside [170,230]             </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>6                    </td>
+		</tr>
+		<tr>
+			<td> Large <span class="caps">RMS</span> (noisy channels)                  </td>
+			<td>     0 </td>
+			<td> <span class="caps">LRG</span>6                    </td>
+		</tr>
+		<tr>
+			<td> Very large <span class="caps">RMS</span> (very noisy channels)        </td>
+			<td>     0 </td>
+			<td> <span class="caps">VLRG</span>6                   </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and noisy channels             </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>6+LRG6               </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and very noisy                 </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>6+VLRG6              </td>
+		</tr>
+		<tr>
+			<td> Dead pedestal channels                      </td>
+			<td>    61 </td>
+			<td> <span class="caps">DPG</span>12                   </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean outside [170,230]             </td>
+			<td>  1233 </td>
+			<td> <span class="caps">BPG</span>12                   </td>
+		</tr>
+		<tr>
+			<td> Large <span class="caps">RMS</span> (noisy channels)                  </td>
+			<td> 60621 </td>
+			<td> <span class="caps">LRG</span>12                   </td>
+		</tr>
+		<tr>
+			<td> Very large <span class="caps">RMS</span> (very noisy channels)        </td>
+			<td>    39 </td>
+			<td> <span class="caps">VLRG</span>12                  </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and noisy channels             </td>
+			<td>  1217 </td>
+			<td> <span class="caps">BPG</span>12+LRG12             </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and very noisy                 </td>
+			<td>     6 </td>
+			<td> <span class="caps">BPG</span>12+VLRG12            </td>
+		</tr>
+	</table>
+
+	<table>
+	<caption>Statistics by <span class="caps">FLAGS</span></caption>
+		<tr>
+			<th>Flag </th>
+			<th>Number of channels </th>
+		</tr>
+		<tr>
+			<td> <span class="caps">DPG</span>1     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">BPG</span>1     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">LRG</span>1     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">VLRG</span>1    </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">DPG</span>6     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">BPG</span>6     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">LRG</span>6     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">VLRG</span>6    </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">DPG</span>12    </td>
+			<td>    61 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">BPG</span>12    </td>
+			<td>  1233 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">LRG</span>12    </td>
+			<td> 60621 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">VLRG</span>12   </td>
+			<td>    39 </td>
+		</tr>
+	</table>
+
+	<h3>Plots <a name="h3_1"/> <a href="#top">↑</a></h3>
+
+	<table class="imgtab">
+	<colgroup span="3" width="300">
+	</colgroup>
+		<tr>
+			<td> <a href="pedestals_hvon/G1_MEAN_EB.1D.png" class="img"><img alt="" src="pedestals_hvon/G1_MEAN_EB.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G6_MEAN_EB.1D.png" class="img"><img alt="" src="pedestals_hvon/G6_MEAN_EB.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G12_MEAN_EB.1D.png" class="img"><img alt="" src="pedestals_hvon/G12_MEAN_EB.1D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean value distribution (HV ON, gain 1) </td>
+			<td> Pedestal mean value distribution (HV ON, gain 6) </td>
+			<td> Pedestal mean value distribution (HV ON, gain 12) </td>
+		</tr>
+		<tr>
+			<td> <a href="pedestals_hvon/G1_RMS_EB.1D.png" class="img"><img alt="" src="pedestals_hvon/G1_RMS_EB.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G6_RMS_EB.1D.png" class="img"><img alt="" src="pedestals_hvon/G6_RMS_EB.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G12_RMS_EB.1D.png" class="img"><img alt="" src="pedestals_hvon/G12_RMS_EB.1D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal rms distribution (HV ON, gain 1) </td>
+			<td> Pedestal rms distribution (HV ON, gain 6) </td>
+			<td> Pedestal rms distribution (HV ON, gain 12) </td>
+		</tr>
+		<tr>
+			<td> <a href="pedestals_hvoff/G1_MEAN_EB.1D.png" class="img"><img alt="" src="pedestals_hvoff/G1_MEAN_EB.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G6_MEAN_EB.1D.png" class="img"><img alt="" src="pedestals_hvoff/G6_MEAN_EB.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G12_MEAN_EB.1D.png" class="img"><img alt="" src="pedestals_hvoff/G12_MEAN_EB.1D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean value distribution (HV <span class="caps">OFF</span>, gain 1) </td>
+			<td> Pedestal mean value distribution (HV <span class="caps">OFF</span>, gain 6) </td>
+			<td> Pedestal mean value distribution (HV <span class="caps">OFF</span>, gain 12) </td>
+		</tr>
+		<tr>
+			<td> <a href="pedestals_hvoff/G1_RMS_EB.1D.png" class="img"><img alt="" src="pedestals_hvoff/G1_RMS_EB.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G6_RMS_EB.1D.png" class="img"><img alt="" src="pedestals_hvoff/G6_RMS_EB.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G12_RMS_EB.1D.png" class="img"><img alt="" src="pedestals_hvoff/G12_RMS_EB.1D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal rms distribution (HV <span class="caps">OFF</span>, gain 1) </td>
+			<td> Pedestal rms distribution (HV <span class="caps">OFF</span>, gain 6) </td>
+			<td> Pedestal rms distribution (HV <span class="caps">OFF</span>, gain 12) </td>
+		</tr>
+	</table>
+
+	<h2><span class="caps">PEDESTAL</span> EE <span class="caps">ANALYSIS</span> <a name="h2_3"/> <a href="#top">↑</a></h2>
+
+	<table>
+	<caption>Channel statistics (EE)</caption>
+	<colgroup span="4" width="150">
+	<col width="180" />
+	</colgroup>
+		<tr>
+			<th>&nbsp; </th>
+			<th>Gain 1 </th>
+			<th>Gain 6 </th>
+			<th>Gain 12 </th>
+		</tr>
+		<tr>
+			<td> Missing channels </td>
+			<td> 14648 </td>
+			<td> 14648 </td>
+			<td> 175 </td>
+		</tr>
+		<tr>
+			<td> Active  channels </td>
+			<td> 0 </td>
+			<td> 0 </td>
+			<td> 14473 </td>
+		</tr>
+	</table>
+
+	<table>
+	<caption>Classes of pedestal problematic channels</caption>
+		<tr>
+			<th>&nbsp;                                    </th>
+			<th>Count </th>
+			<th>Short name            </th>
+		</tr>
+		<tr>
+			<td> Dead pedestal channels                      </td>
+			<td>     0 </td>
+			<td> <span class="caps">DPG</span>1                    </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean outside [170,230]             </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>1                    </td>
+		</tr>
+		<tr>
+			<td> Large <span class="caps">RMS</span> (noisy channels)                  </td>
+			<td>     0 </td>
+			<td> <span class="caps">LRG</span>1                    </td>
+		</tr>
+		<tr>
+			<td> Very large <span class="caps">RMS</span> (very noisy channels)        </td>
+			<td>     0 </td>
+			<td> <span class="caps">VLRG</span>1                   </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and noisy channels             </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>1+LRG1               </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and very noisy                 </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>1+VLRG1              </td>
+		</tr>
+		<tr>
+			<td> Dead pedestal channels                      </td>
+			<td>     0 </td>
+			<td> <span class="caps">DPG</span>6                    </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean outside [170,230]             </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>6                    </td>
+		</tr>
+		<tr>
+			<td> Large <span class="caps">RMS</span> (noisy channels)                  </td>
+			<td>     0 </td>
+			<td> <span class="caps">LRG</span>6                    </td>
+		</tr>
+		<tr>
+			<td> Very large <span class="caps">RMS</span> (very noisy channels)        </td>
+			<td>     0 </td>
+			<td> <span class="caps">VLRG</span>6                   </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and noisy channels             </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>6+LRG6               </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and very noisy                 </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>6+VLRG6              </td>
+		</tr>
+		<tr>
+			<td> Dead pedestal channels                      </td>
+			<td>     2 </td>
+			<td> <span class="caps">DPG</span>12                   </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean outside [170,230]             </td>
+			<td>  4630 </td>
+			<td> <span class="caps">BPG</span>12                   </td>
+		</tr>
+		<tr>
+			<td> Large <span class="caps">RMS</span> (noisy channels)                  </td>
+			<td>    36 </td>
+			<td> <span class="caps">LRG</span>12                   </td>
+		</tr>
+		<tr>
+			<td> Very large <span class="caps">RMS</span> (very noisy channels)        </td>
+			<td>     2 </td>
+			<td> <span class="caps">VLRG</span>12                  </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and noisy channels             </td>
+			<td>     2 </td>
+			<td> <span class="caps">BPG</span>12+LRG12             </td>
+		</tr>
+		<tr>
+			<td> Bad pedestal and very noisy                 </td>
+			<td>     0 </td>
+			<td> <span class="caps">BPG</span>12+VLRG12            </td>
+		</tr>
+	</table>
+
+	<table>
+	<caption>Statistics by <span class="caps">FLAGS</span></caption>
+		<tr>
+			<th>Flag </th>
+			<th>Number of channels </th>
+		</tr>
+		<tr>
+			<td> <span class="caps">DPG</span>1     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">BPG</span>1     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">LRG</span>1     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">VLRG</span>1    </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">DPG</span>6     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">BPG</span>6     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">LRG</span>6     </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">VLRG</span>6    </td>
+			<td>     0 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">DPG</span>12    </td>
+			<td>     2 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">BPG</span>12    </td>
+			<td>  4630 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">LRG</span>12    </td>
+			<td>    36 </td>
+		</tr>
+		<tr>
+			<td> <span class="caps">VLRG</span>12   </td>
+			<td>     2 </td>
+		</tr>
+	</table>
+
+	<h3>Plots <a name="h3_2"/> <a href="#top">↑</a></h3>
+
+	<table class="imgtab">
+	<colgroup span="3" width="300">
+	</colgroup>
+		<tr>
+			<td> <a href="pedestals_hvon/G1_MEAN_EE.1D.png" class="img"><img alt="" src="pedestals_hvon/G1_MEAN_EE.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G6_MEAN_EE.1D.png" class="img"><img alt="" src="pedestals_hvon/G6_MEAN_EE.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G12_MEAN_EE.1D.png" class="img"><img alt="" src="pedestals_hvon/G12_MEAN_EE.1D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean value distribution (HV ON, gain 1) </td>
+			<td> Pedestal mean value distribution (HV ON, gain 6) </td>
+			<td> Pedestal mean value distribution (HV ON, gain 12) </td>
+		</tr>
+		<tr>
+			<td> <a href="pedestals_hvon/G1_RMS_EE.1D.png" class="img"><img alt="" src="pedestals_hvon/G1_RMS_EE.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G6_RMS_EE.1D.png" class="img"><img alt="" src="pedestals_hvon/G6_RMS_EE.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G12_RMS_EE.1D.png" class="img"><img alt="" src="pedestals_hvon/G12_RMS_EE.1D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal rms distribution (HV ON, gain 1) </td>
+			<td> Pedestal rms distribution (HV ON, gain 6) </td>
+			<td> Pedestal rms distribution (HV ON, gain 12) </td>
+		</tr>
+		<tr>
+			<td> <a href="pedestals_hvoff/G1_MEAN_EE.1D.png" class="img"><img alt="" src="pedestals_hvoff/G1_MEAN_EE.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G6_MEAN_EE.1D.png" class="img"><img alt="" src="pedestals_hvoff/G6_MEAN_EE.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G12_MEAN_EE.1D.png" class="img"><img alt="" src="pedestals_hvoff/G12_MEAN_EE.1D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean value distribution (HV <span class="caps">OFF</span>, gain 1) </td>
+			<td> Pedestal mean value distribution (HV <span class="caps">OFF</span>, gain 6) </td>
+			<td> Pedestal mean value distribution (HV <span class="caps">OFF</span>, gain 12) </td>
+		</tr>
+		<tr>
+			<td> <a href="pedestals_hvoff/G1_RMS_EE.1D.png" class="img"><img alt="" src="pedestals_hvoff/G1_RMS_EE.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G6_RMS_EE.1D.png" class="img"><img alt="" src="pedestals_hvoff/G6_RMS_EE.1D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G12_RMS_EE.1D.png" class="img"><img alt="" src="pedestals_hvoff/G12_RMS_EE.1D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal rms distribution (HV <span class="caps">OFF</span>, gain 1) </td>
+			<td> Pedestal rms distribution (HV <span class="caps">OFF</span>, gain 6) </td>
+			<td> Pedestal rms distribution (HV <span class="caps">OFF</span>, gain 12) </td>
+		</tr>
+	</table>
+
+	<h2>Pedestal maps <a name="h2_4"/> <a href="#top">↑</a></h2>
+
+	<table class="imgtab">
+	<colgroup span="3" width="300">
+	</colgroup>
+		<tr>
+			<td> <a href="pedestals_hvon/G1_MEAN.2D.png" class="img"><img alt="" src="pedestals_hvon/G1_MEAN.2D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G6_MEAN.2D.png" class="img"><img alt="" src="pedestals_hvon/G6_MEAN.2D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G12_MEAN.2D.png" class="img"><img alt="" src="pedestals_hvon/G12_MEAN.2D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean value map (HV ON, gain 1) </td>
+			<td> Pedestal mean value map (HV ON, gain 6) </td>
+			<td> Pedestal mean value map (HV ON, gain 12) </td>
+		</tr>
+		<tr>
+			<td> <a href="pedestals_hvon/G1_RMS.2D.png" class="img"><img alt="" src="pedestals_hvon/G1_RMS.2D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G6_RMS.2D.png" class="img"><img alt="" src="pedestals_hvon/G6_RMS.2D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvon/G12_RMS.2D.png" class="img"><img alt="" src="pedestals_hvon/G12_RMS.2D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal rms map (HV ON, gain 1) </td>
+			<td> Pedestal rms map (HV ON, gain 6) </td>
+			<td> Pedestal rms map (HV ON, gain 12) </td>
+		</tr>
+		<tr>
+			<td> <a href="pedestals_hvoff/G1_MEAN.2D.png" class="img"><img alt="" src="pedestals_hvoff/G1_MEAN.2D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G6_MEAN.2D.png" class="img"><img alt="" src="pedestals_hvoff/G6_MEAN.2D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G12_MEAN.2D.png" class="img"><img alt="" src="pedestals_hvoff/G12_MEAN.2D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal mean value map (HV <span class="caps">OFF</span>, gain 1) </td>
+			<td> Pedestal mean value map (HV <span class="caps">OFF</span>, gain 6) </td>
+			<td> Pedestal mean value map (HV <span class="caps">OFF</span>, gain 12) </td>
+		</tr>
+		<tr>
+			<td> <a href="pedestals_hvoff/G1_RMS.2D.png" class="img"><img alt="" src="pedestals_hvoff/G1_RMS.2D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G6_RMS.2D.png" class="img"><img alt="" src="pedestals_hvoff/G6_RMS.2D.png" style="width: 300px;" /></a> </td>
+			<td> <a href="pedestals_hvoff/G12_RMS.2D.png" class="img"><img alt="" src="pedestals_hvoff/G12_RMS.2D.png" style="width: 300px;" /></a> </td>
+		</tr>
+		<tr>
+			<td> Pedestal rms map (HV <span class="caps">OFF</span>, gain 1) </td>
+			<td> Pedestal rms map (HV <span class="caps">OFF</span>, gain 6) </td>
+			<td> Pedestal rms map (HV <span class="caps">OFF</span>, gain 12) </td>
+		</tr>
+	</table>
+
+	<h1><span class="caps">TEST</span> <span class="caps">PULSE</span> <span class="caps">ANALYSIS</span> <a name="h1_3"/> <a href="#top">↑</a></h1>
+
+	<p>No testpulse data present</p>
+
+	<h1><span class="caps">LASER</span> <span class="caps">ANALYSIS</span> <a name="h1_4"/> <a href="#top">↑</a></h1>
+
+	<p>No laser data present</p>
+
+	<h1>Problematic Channels Summary for EB <a name="h1_5"/> <a href="#top">↑</a></h1>
+
+	<table>
+		<tr>
+			<th colspan="2">Problem classes (&#8220;at least&#8221;)  </th>
+			<th>Number of channels  </th>
+		</tr>
+		<tr>
+			<td> Pedestals problems </td>
+			<td> PE </td>
+			<td> 60731 </td>
+		</tr>
+		<tr>
+			<td> Test Pulse problems </td>
+			<td> TP </td>
+			<td> No Data </td>
+		</tr>
+		<tr>
+			<td> Laser problems </td>
+			<td> LA </td>
+			<td> No Data </td>
+		</tr>
+		<tr>
+			<td> Pedestals problems + Test Pulse problems </td>
+			<td> PE+TP </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Pedestals problems + Laser problems </td>
+			<td> PE+LA </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Test Pulse problems + Laser problems </td>
+			<td> TP+LA </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Pedestals problems + Test Pulse problems + Laser problems </td>
+			<td> PE+TP+LA </td>
+			<td> Not Enough Data </td>
+		</tr>
+	</table>
+
+	<h1>Problematic Channels Summary for EE <a name="h1_6"/> <a href="#top">↑</a></h1>
+
+	<table>
+		<tr>
+			<th colspan="2">Problem classes (&#8220;at least&#8221;)  </th>
+			<th>Number of channels  </th>
+		</tr>
+		<tr>
+			<td> Pedestals problems </td>
+			<td> PE </td>
+			<td> 60731 </td>
+		</tr>
+		<tr>
+			<td> Test Pulse problems </td>
+			<td> TP </td>
+			<td> No Data </td>
+		</tr>
+		<tr>
+			<td> Laser problems </td>
+			<td> LA </td>
+			<td> No Data </td>
+		</tr>
+		<tr>
+			<td> High voltage problems </td>
+			<td> HV </td>
+			<td> No Data </td>
+		</tr>
+		<tr>
+			<td> Pedestals problems + Test Pulse problems </td>
+			<td> PE+TP </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Pedestals problems + Laser problems </td>
+			<td> PE+LA </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Pedestals problems + High voltage problems </td>
+			<td> PE+HV </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Test Pulse problems + Laser problems </td>
+			<td> TP+LA </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Test Pulse problems + High voltage problems </td>
+			<td> TP+HV </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Laser problems + High voltage problems </td>
+			<td> LA+HV </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Pedestals problems + Test Pulse problems + Laser problems </td>
+			<td> PE+TP+LA </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Pedestals problems + Test Pulse problems + High voltage problems </td>
+			<td> PE+TP+HV </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Pedestals problems + Laser problems + High voltage problems </td>
+			<td> PE+LA+HV </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Test Pulse problems + Laser problems + High voltage problems </td>
+			<td> TP+LA+HV </td>
+			<td> Not Enough Data </td>
+		</tr>
+		<tr>
+			<td> Pedestals problems + Test Pulse problems + Laser problems + High voltage problems </td>
+			<td> PE+TP+LA+HV </td>
+			<td> Not Enough Data </td>
+		</tr>
+	</table>
+
+	<p><a href="flags.html">Summary of all channels with flags</a></p>
+
+	<h1>Description of errors <a name="h1_7"/> <a href="#top">↑</a></h1>
+
+	<h2>Description of errors for EB</h2>
+
+	<p>Dead pedestal  (DP)</p>
+
+	<ul>
+		<li>Gain 1 : <span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.2</li>
+		<li>Gain 6 : <span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.4</li>
+		<li>Gain 12: <span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.5</li>
+	</ul>
+
+ Bad pedestal   (BP)
+
+	<ul>
+		<li>abs(MEAN &#8211; 200) >= 30 and MEAN > 1</li>
+	</ul>
+
+ Large <span class="caps">RMS</span>      (LR)
+
+	<ul>
+		<li>Gain 1 : (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.2)) and (RMS >= 1.1 and <span class="caps">RMS</span> < 3 and MEAN > 1)</li>
+		<li>Gain 6 : (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.4)) and (RMS >= 1.3 and <span class="caps">RMS</span> < 4 and MEAN > 1)</li>
+		<li>Gain 12: (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.5)) and (RMS >= 2.1 and <span class="caps">RMS</span> < 6 and MEAN > 1)</li>
+	</ul>
+
+ Very Large <span class="caps">RMS</span> (<span class="caps">VLR</span>)
+
+	<ul>
+		<li>Gain 1 : (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.2)) and (RMS > 3 and MEAN > 1)</li>
+		<li>Gain 6 : (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.4)) and (RMS > 4 and MEAN > 1)</li>
+		<li>Gain 12: (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.5)) and (RMS > 6 and MEAN > 1)</li>
+	</ul>
+
+	<h2>Description of errors for EE</h2>
+
+ Dead pedestal  (DP)
+
+	<ul>
+		<li>Gain 1 : <span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.2</li>
+		<li>Gain 6 : <span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.4</li>
+		<li>Gain 12: <span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.5</li>
+	</ul>
+
+ Bad pedestal   (BP)
+
+	<ul>
+		<li>abs(MEAN &#8211; 200) >= 30 and MEAN > 1</li>
+	</ul>
+
+ Large <span class="caps">RMS</span>      (LR)
+
+	<ul>
+		<li>Gain 1 : (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.2)) and (RMS >= 1.5 and <span class="caps">RMS</span> < 4 and MEAN > 1)</li>
+		<li>Gain 6 : (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.4)) and (RMS >= 2.0 and <span class="caps">RMS</span> < 5 and MEAN > 1)</li>
+		<li>Gain 12: (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.5)) and (RMS >= 3.2 and <span class="caps">RMS</span> < 7 and MEAN > 1)</li>
+	</ul>
+
+ Very Large <span class="caps">RMS</span> (<span class="caps">VLR</span>)
+
+	<ul>
+		<li>Gain 1 : (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.2)) and (RMS > 4 and MEAN > 1)</li>
+		<li>Gain 6 : (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.4)) and (RMS > 5 and MEAN > 1)</li>
+		<li>Gain 12: (not (<span class="caps">MEAN</span> <= 1 or <span class="caps">RMS</span> <= 0.5)) and (RMS > 7 and MEAN > 1)</li>
+	</ul>
+
+	<h2>Description of HV <span class="caps">OFF</span> errors:</h2>
+
+ Bad Voltage for G12 (BV)
+
+	<ul>
+		<li>abs(<span class="caps">RMS</span>&#40;<span class="caps">HVON</span>) &#8211; <span class="caps">RMS</span>&#40;<span class="caps">HVOFF</span>)) < 0.2 and 170 <= <span class="caps">MEAN</span>&#40;<span class="caps">HVON</span>) <= 230</li>
+	</ul>
+
+	<h2>Description of Test Pulse errors</h2>
+
+ Dead TestPulse          (<span class="caps">DTP</span>)
+
+	<ul>
+		<li><span class="caps">MEAN</span> = 0</li>
+	</ul>
+
+ Low TestPulse amplitude (<span class="caps">STP</span>)
+
+	<ul>
+		<li><span class="caps">AVG</span> = average mean for each subdetector (EB, EE)</li>
+		<li>MEAN > 0 and <span class="caps">MEAN</span> < 0.5 * <span class="caps">AVG</span></li>
+	</ul>
+
+ Large TP amplitude      (<span class="caps">LTP</span>)
+
+	<ul>
+		<li>MEAN > 1.5 * <span class="caps">AVG</span></li>
+	</ul>
+
+	<h2>Description of Laser Pulse errors:</h2>
+
+	<ul>
+		<li><span class="caps">DLAMPL</span>: <span class="caps">MEAN</span> <= 0</li>
+		<li>SLAMPL: MEAN > 0 and <span class="caps">MEAN</span> < <span class="caps">AVG</span> * 0.1         # <span class="caps">AVG</span> per subdetector</li>
+		<li>LLERRO: MEAN > AVG * 0.1 and RMS / MEAN > 0.1 # <span class="caps">AVG</span> per subdetector</li>
+	</ul>
+
+	<p>Elapsed time: 0:00:41.507572</p></body>
+</html>
