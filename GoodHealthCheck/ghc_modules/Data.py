@@ -718,15 +718,20 @@ class Data(object):
 ###############################
 #  OPTIMIZE WITH BULK INSERT  #
 ############################### 
+    value_rows = []
     for row in result:
         for k in range(len(fields)):
-#               f.write(f'ghc: {self.ghc_id}, dbid: {row[0]}, key: {fields[k]}, value: {row[k + 1]}\n')
-            cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s"
-                    ", (SELECT keyid FROM valuekeys WHERE key=%(key)s), %(value)s)",
-                    {'ghc': self.ghc_id, 'dbid': row[0], 'key': fields[k], 'value': row[k + 1]})
+            #cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s (SELECT keyid FROM valuekeys WHERE key=%(key)s), %(value)s)", {'ghc': self.ghc_id, 'dbid': row[0], 'key': fields[k], 'value': row[k + 1]})
+            value_rows.append((self.ghc_id, row[0], self.valuekeysDict[fields[k]], row[k + 1]))        
             counter += 1
-            logger.info("Exported {0} records".format(counter))
-            self.dbh.commit()
+    if value_rows:
+        insert_query = """
+            INSERT INTO "values" (ghc, dbid, keyid, value)
+            VALUES %s
+        """
+        execute_values(cur, insert_query, value_rows)
+        logger.info("Exported {0} records".format(counter))
+        self.dbh.commit()
 
   def readDataFromFile(self, datatype, files):
     """

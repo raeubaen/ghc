@@ -121,7 +121,6 @@ if args.redo is None:
 
     if args.pon_runs is not None:
         logging.info("Pedestals with HV on...")
-        print('PED_HV')
         GHC.readData(source, runs=args.pon_runs.split(), data_type="pedestal_hvon")
     if args.poff_runs is not None:
         logging.info("Pedestals with HV off...")
