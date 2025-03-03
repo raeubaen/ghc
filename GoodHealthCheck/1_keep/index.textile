@@ -20,8 +20,8 @@ h2. PEDESTAL EB ANALYSIS <a name="h2_2"/> <a href="#top">↑</a>
 |=. Channel statistics (EB)
 |_. &nbsp; |_. Gain 1 |_. Gain 6 |_. Gain 12 |
 |:\4. 150 | 180 |
-| Missing channels | 61200 | 61200 | 459 |
-| Active  channels | 0 | 0 | 60741 |
+| Missing channels | 459 | 459 | 459 |
+| Active  channels | 60741 | 60741 | 60741 |
 
 |=. Classes of pedestal problematic channels
 |_. &nbsp;                                    |_. Count |_. Short name            |
@@ -79,8 +79,8 @@ h2. PEDESTAL EE ANALYSIS <a name="h2_3"/> <a href="#top">↑</a>
 |=. Channel statistics (EE)
 |_. &nbsp; |_. Gain 1 |_. Gain 6 |_. Gain 12 |
 |:\4. 150 | 180 |
-| Missing channels | 14648 | 14648 | 175 |
-| Active  channels | 0 | 0 | 14473 |
+| Missing channels | 175 | 175 | 175 |
+| Active  channels | 14473 | 14473 | 14473 |
 
 |=. Classes of pedestal problematic channels
 |_. &nbsp;                                    |_. Count |_. Short name            |
@@ -269,4 +269,4 @@ h2. Description of Laser Pulse errors:
 * LLERRO: MEAN > AVG * 0.1 and RMS / MEAN > 0.1 # AVG per subdetector
 
 
-p. Elapsed time: 0:01:01.576236
+p. Elapsed time: 0:00:57.292437
