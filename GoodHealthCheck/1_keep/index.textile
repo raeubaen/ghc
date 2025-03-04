@@ -269,4 +269,4 @@ h2. Description of Laser Pulse errors:
 * LLERRO: MEAN > AVG * 0.1 and RMS / MEAN > 0.1 # AVG per subdetector
 
 
-p. Elapsed time: 0:00:57.292437
+p. Elapsed time: 0:00:57.463851
