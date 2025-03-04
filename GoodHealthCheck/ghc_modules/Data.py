@@ -17,15 +17,13 @@ from pfgutils import Settings
 import pandas as pd
 import time
 from psycopg2.extras import execute_values
-## chdb = pfgutils.connection.ecalchannels
-## cur_chdb = chdb.cursor()
+# chdb = pfgutils.connection.ecalchannels
+# cur_chdb = chdb.cursor()
 
-## Load the CSV into a DataFrame    
+# Load the CSV into a DataFrame    
 ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
 df = pd.read_csv(ecalchannels_path, header=None)
     
-   
-
 logger = logging.getLogger()
 
 
@@ -57,10 +55,6 @@ class Data(object):
       self.ghc_id = self.cur.fetchone()[0]
       self.can_redo = False
       self.dbh.commit()
-
-    
-##    self.ghc_id = ghc_id
-##    self.can_redo = True
 
     self.keep_bad = keep
     self.masked_channels = None
@@ -234,7 +228,6 @@ class Data(object):
       datatype = ['PED_OFF_MEAN%', 'PED_ON_MEAN%', 'ADC_MEAN%', 'APD_MEAN%']
 
     if is_iterable(datatype):
-      ###############################################THIS SHIT BROKEN
       sql_items = []
       values = {'ghc': self.ghc_id, 'det': det_to_sql(det)}
       for i, d in enumerate(datatype):
@@ -418,11 +411,11 @@ class Data(object):
           self.cur.execute(sql, ('LTP' + gain, self.ghc_id, 'ADC_MEAN_' + gain, l))
 
     def ped_hvoff():
-      ## pedestal HV OFF channels problems only for EB
+      # pedestal HV OFF channels problems only for EB
       cur_on = self.dbh.cursor()
       cur_off = self.dbh.cursor()
       pre = "^[BD]P"
-      ## Botjo checks only G12 RMS
+      # Botjo checks only G12 RMS
       for gain in ["G12"]:
         data = defaultdict(lambda: [None, None])
         sql_on = "SELECT dbid, value FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) WHERE " \
@@ -545,9 +538,9 @@ class Data(object):
       logger.debug("Error details: ", exc_info=True)
       self.dbh.rollback()
       is_classified = False
-    ## missed channels
+    # missed channels
     logger.info("Try to find missed channels ...")
-    ## pedestal hv on/off and testpulse
+    # pedestal hv on/off and testpulse
     try:
       missed_channels = set()
       for t in ['pedestal_hvon', 'testpulse']:
@@ -584,7 +577,6 @@ class Data(object):
     self.dbh.commit()
 
   def getFlagsForAllChannels(self):
-    ##CACHE FLAG FOR 'ALL' METHODS AND MAYBE CALL IN __init__##
     self.classifyChannels()
     query = "SELECT * FROM flags WHERE ghc = %s"
     
@@ -599,8 +591,6 @@ class Data(object):
   def getFlagsForChannel(self, channel):
     if self.isMasked(channel):
       return []
-    ##################################CLASSIFY ONCE ON OBJECT CREATION MAYBE????
-    #self.classifyChannels()
     channel = int(channel)
     return self.channel_flag_cache.get(channel, [])
   def getChannelsWithFlag(self, flags, exp="and", det=None):
@@ -714,20 +704,17 @@ class Data(object):
       result = c._oradbh.cursor().execute(sql, (iov,))
 ##      cur.execute("INSERT INTO runs VALUES (%s, %s, %s, %s)", (self.ghc_id, run, data_type, gain))
      
-    counter = 0
-###############################
-#  OPTIMIZE WITH BULK INSERT  #
-############################### 
-    value_rows = []
-    for row in result:
+      counter = 0
+      value_rows = []
+      for row in result:
         for k in range(len(fields)):
             #cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s (SELECT keyid FROM valuekeys WHERE key=%(key)s), %(value)s)", {'ghc': self.ghc_id, 'dbid': row[0], 'key': fields[k], 'value': row[k + 1]})
-            value_rows.append((self.ghc_id, row[0], self.valuekeysDict[fields[k]], row[k + 1]))        
-            counter += 1
-    if value_rows:
+          value_rows.append((self.ghc_id, row[0], self.valuekeysDict[fields[k]], row[k + 1]))        
+          counter += 1
+      if value_rows:
         insert_query = """
-            INSERT INTO "values" (ghc, dbid, keyid, value)
-            VALUES %s
+          INSERT INTO "values" (ghc, dbid, keyid, value)
+          VALUES %s
         """
         execute_values(cur, insert_query, value_rows)
         logger.info("Exported {0} records".format(counter))

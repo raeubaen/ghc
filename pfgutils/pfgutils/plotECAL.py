@@ -160,12 +160,12 @@ def getCanvasHistDbIds(data):
     else:
       return
     newdata[key].append(((x, y), value))
+ # return newdata
   return getCanvasHist(newdata)
-
 
 def getCanvasHist(data):
   ROOT.gStyle.SetOptStat(0)
-  ROOT.gStyle.SetNumberContours(15)
+  #ROOT.guse_rms = 'RMS' in keyStyle.SetNumberContours(15)
   name = "Unnamed" if 'name' not in data else str(data['name'])
   title = "Unnamed" if 'name' not in data else str(data['title'])
   if name != "Unnamed" and title == "Unnamed":
@@ -256,25 +256,26 @@ def getCanvasHist(data):
         EE2.Fill(x - 1, y - 1, value)
       else:
         EE1.Fill(x - 1, y - 1, value)
-
+  c.SetCanvasSize(3600, 2710)
   # plot Barrel
   pad = c.cd(1)
-  pad.SetCanvasSize(3600, 1710)
+  pad.SetPad(0, 0.37, 1, 1)
   EB.Draw('colz')
   _drawEBextra(c, 1)
 
   # Endcap
   pad0 = c.cd(2)
   pad0.Divide(2, 1)
-
+  pad0.SetPad(0, 0, 1, 0.37)
+  
   # Endcap z = -1
   pad1 = pad0.cd(1)
-  pad1.SetCanvasSize(1000, 1000)
+  pad1.SetPad(0, 0, 0.5, 1)
 
   EE1.Draw("colz")
   _drawEEextra(pad0, 1, -1)
   pad2 = pad0.cd(2)
-  pad2.SetCanvasSize(1000, 1000)
+  pad2.SetPad(0.5, 0, 1, 1)
   EE2.Draw("colz")
   _drawEEextra(pad0, 2, 1)
 

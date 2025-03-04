@@ -22,7 +22,7 @@ class Plotter(object):
 
     activech = self.data.getActiveChannels(key, det=det)
     if not activech:
-      logging.warning("empty list of active channels")
+      logging.warning(f'empty list of active channels: {key}')
       return None
     self.data.getAllChannelData()###FIND GOOD SPOT TO CALL ONCE
     if dimx is None:
@@ -45,6 +45,8 @@ class Plotter(object):
       val = None
       try:
         val = self.data.getChannelData(ch, key=key)
+        if val is None:
+            logging.warning(f'Channel {ch} returned None for key {key}')
         hist.Fill(float(val))
       except Exception:
         if val is None:
@@ -95,7 +97,7 @@ class Plotter(object):
     activech = self.data.getActiveChannels(key)
 
     if not activech:
-      logging.warning("empty list of active channels")
+      logging.warning(f'empty list of active channels: {key}')
       return 
     self.data.getAllChannelData()
     hist = {'name': name, 'title': name, 'values': [],
@@ -109,14 +111,16 @@ class Plotter(object):
     for ch in activech:
       try:
         val = self.data.getChannelData(ch, key=key)
+        if val is None:
+            logging.warning(f'Channel {ch} returned None for key {key}')
         hist['values'].append([ch, float(val)])
       except Exception:
         if 'val' not in locals():
           logging.exception("Cannot get value from channel %s and key %s!".format(ch, key))
         else:
           logging.exception("Cannot fill value %s!", val)
-
     return plotECAL.getCanvasDbIds(hist)
+    #return hist
 
   @staticmethod
   def saveHistogram(histogram, filename):
@@ -126,26 +130,27 @@ class Plotter(object):
     """
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
     try:
+      if not histogram:
+        logging.warning(f'Histogram is None for {filename}')
+        return
       if isinstance(histogram, ROOT.TCanvas):  # type(histogram) is ROOT.TCanvas:
         c = histogram
-        # # return
-        # histogram.Draw("colz")
-        # c.SetGridx(True)
-        # c.SetGridy(True)
-        # ROOT.gStyle.SetOptStat("e")
-        # ROOT.gStyle.SetTickLength(0.01, "xy")
-        # if plottype == "EB":
-        #     drawEBNumbers()
-        # elif plottype == "EE":
-        #     c.SetCanvasSize(1000, 500)
-        #     lines = []
-        #     for p in getEELines():
-        #         lines.append(DrawLine(p[0], p[1]))
-        #     for i in lines:
-        #         i.Draw()
-        #     getEENumbers()
-      if not histogram:
-        return
+#        # return
+#        histogram.Draw("colz")
+#        c.SetGridx(True)
+#        c.SetGridy(True)
+#        ROOT.gStyle.SetOptStat("e")
+#        ROOT.gStyle.SetTickLength(0.01, "xy")
+#        if plottype == "EB":
+#            drawEBNumbers()
+#        elif plottype == "EE":
+#            c.SetCanvasSize(1000, 500)
+#            lines = []
+#            for p in getEELines():
+#                lines.append(DrawLine(p[0], p[1]))
+#            for i in lines:
+#                i.Draw()
+#            getEENumbers()
       else:
         c = ROOT.TCanvas()
         c.SetLogy()
