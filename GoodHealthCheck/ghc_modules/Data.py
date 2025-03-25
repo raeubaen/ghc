@@ -698,7 +698,7 @@ class Data(object):
       cur.close()
       cur = self.dbh.cursor()
       result = c._oradbh.cursor().execute(sql, (iov,))
-##      cur.execute("INSERT INTO runs VALUES (%s, %s, %s, %s)", (self.ghc_id, run, data_type, gain))
+      cur.execute("INSERT INTO runs VALUES (%s, %s, %s, %s)", (self.ghc_id, run, data_type, gain))
      
       counter = 0
       value_rows = []
