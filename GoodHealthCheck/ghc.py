@@ -17,9 +17,9 @@ import textile2html
 from ghc_modules import Data
 from ghc_modules.Plot import Plotter
 from pfgutils import textile
-from pfgutils.Settings import max_good_status
+from Settings import max_good_status
 
-import pfgutils.connection
+import connection
 
 startts = datetime.datetime.now()
 

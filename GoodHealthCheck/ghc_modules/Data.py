@@ -11,14 +11,12 @@ import sqlite3
 
 import psycopg2
 
-import pfgutils.connection
-from pfgutils import Settings
+import connection
+import Settings
 
 import pandas as pd
 import time
 from psycopg2.extras import execute_values
-# chdb = pfgutils.connection.ecalchannels
-# cur_chdb = chdb.cursor()
 
 # Load the CSV into a DataFrame    
 ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
@@ -37,12 +35,11 @@ class Data(object):
   LASER_FLAGS = ['DLAMPL', 'SLAMPL', 'LLERRO']
 
   def __init__(self, ghc_id, keep):
-    
-      
+    """
+      Constructor for Data object
+    """    
     self.dbh = conn = psycopg2.connect("postgresql://postgres:cp0psuvqQ7CBLYJE@db.yrugopcygvlzarsywqrp.supabase.co:5432/postgres")
-
     self.cur = self.dbh.cursor()
-
     self.cur.execute(f"SELECT ghc FROM ghc WHERE ghc_id={ghc_id}")
     res = self.cur.fetchone()
     
@@ -102,7 +99,6 @@ class Data(object):
           valuekeysDict[line.strip().split()[1]] = line.strip().split()[0] 
     return valuekeysDict 
 
-#MAYBE REWRITE TO ALLIGN WITH CONNECTION CLASS?
   @staticmethod
   def getAllChannels(det='ALL'):
     """
@@ -166,10 +162,10 @@ class Data(object):
 
   def getInactiveChannels(self, det, datatype=None):
     """
-    Returns list of inactive channel
-    :param det: subdetector
-    :param datatype: data type
-    :return: tuple
+      Returns list of inactive channel
+      :param det: subdetector
+      :param datatype: data type
+      :return: tuple
     """
     if datatype is not None and not self.have_datatype(datatype):
         return tuple()
@@ -652,7 +648,7 @@ class Data(object):
       runs = "G12:{0} G6:{0} G1:{0}".format(runs[0]).split()
 
     logger.info("Trying to connect to Oracle")
-    c = pfgutils.connection.Connection()
+    c = connection.Connection()
     if c._oradbh is None:
       logger.error("Requested source (Oracle) is not available!")
       return
@@ -889,7 +885,7 @@ def getChannelInfo(c):
     keys for EB: id, location, SM, TT, iEta, iPhi
     keys for EE: id, location, SM, Dee, iX, iY, iZ
   """
-  c = pfgutils.connection.Connection()
+  c = connection.Connection()
   info = {'id': c}
   info.update(c.getChDict(c))
   return info
@@ -906,12 +902,7 @@ def getTT(channel):
   """
     Returns TT number for channel
   """
-  c = pfgutils.connection.Connection()
-  return c.getChDict(channel)['tower']
-
-
-def getCCU(channel):
-  c = pfgutils.connection.Connection()
+  c = connection.Connection()
   return c.getChDict(channel)['ccu']
 
 
@@ -919,12 +910,12 @@ def getXtal(channel):
   """
     Returns crystal number for channel
   """
-  c = pfgutils.connection.Connection()
+  c = connection.Connection()
   return c.getChDict(channel)['xtalinccu']
 
 
 def getDetSM(channel):
-  c = pfgutils.connection.Connection()
+  c = connection.Connection()
   return c.getChDict(channel)['det']
 
 
@@ -932,7 +923,7 @@ def getSM(channel):
   """
     Returns SM number for EB channel
   """
-  c = pfgutils.connection.Connection()
+  c = connection.Connection()
   return c.getChDict(channel)['det'][2:]
 
 
@@ -940,7 +931,7 @@ def getEtaPhi(channel):
   """
     Return (Eta, Phi) tuple for EB channels
   """
-  c = pfgutils.connection.Connection()
+  c = connection.Connection()
   r = c.getChDict(channel)
   return r['ieta'], r['iphi']
 
@@ -949,7 +940,7 @@ def getEtaPhiBin(channel):
   """
     Return (Eta, Phi) tuple for EB channels
   """
-  c = pfgutils.connection.Connection()
+  c = connection.Connection()
   r = c.getChDict(channel)
   return r['ieta'] + 86, r['iphi']
 
@@ -958,7 +949,7 @@ def getXYZ(channel):
   """
     Return (x, y , -1|1 ) tuple for EE channels
   """
-  c = pfgutils.connection.Connection()
+  c = connection.Connection()
   r = c.getChDict(channel)
   return r['ix'], r['iy'], r['iz']
 
@@ -967,7 +958,7 @@ def getSubDetector(channel):
   """
     Returns EB|EE detector place of channel
   """
-  c = pfgutils.connection.Connection()
+  c = connection.Connection()
   return c.getChDict(channel)['det'][:2]
 
 

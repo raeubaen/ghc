@@ -148,7 +148,101 @@ table(imgtab).
 
 h1. TEST PULSE ANALYSIS <a name="h1_3"/> <a href="#top">↑</a>
 
-No testpulse data present
+h2. TEST PULSE EB ANALYSIS <a name="h2_5"/> <a href="#top">↑</a>
+
+
+|=. Channel statistics (EB)
+|_. &nbsp; |_. Gain 1 |_. Gain 6 |_. Gain 12 |
+|:\4. 150 | 180 |
+| Missing channels | 459 | 459 | 459 |
+| Active channels | 60741 | 60741 | 60741 |
+
+|=. Classes of Test Pulse problematic channels
+|_. &nbsp;                                    |_. Count |_. Short name            |
+| Dead TP channels                            |     0 | DTPG1                   |
+| Low TP amplitude                            |     0 | STPG1                   |
+| Large TP amplitude                          |     0 | LTPG1                   |
+| Dead TP channels                            |     0 | DTPG6                   |
+| Low TP amplitude                            |     0 | STPG6                   |
+| Large TP amplitude                          |     0 | LTPG6                   |
+| Dead TP channels                            |     0 | DTPG12                  |
+| Low TP amplitude                            |     0 | STPG12                  |
+| Large TP amplitude                          |     0 | LTPG12                  |
+
+|=. Statistics by FLAGS
+|_. Flag |_. Number of channels |
+| DTPG1    |     0 |
+| STPG1    |     0 |
+| LTPG1    |     0 |
+| DTPG6    |     0 |
+| STPG6    |     0 |
+| LTPG6    |     0 |
+| DTPG12   |     0 |
+| STPG12   |     0 |
+| LTPG12   |     0 |
+
+h3. Plots <a name="h3_3"/> <a href="#top">↑</a>
+
+
+table(imgtab).
+|:\3. 300
+| !{width: 300px;}testpulse/G1_MEAN_EB.1D.png!:testpulse/G1_MEAN_EB.1D.png | !{width: 300px;}testpulse/G6_MEAN_EB.1D.png!:testpulse/G6_MEAN_EB.1D.png | !{width: 300px;}testpulse/G12_MEAN_EB.1D.png!:testpulse/G12_MEAN_EB.1D.png |
+| Test pulse mean value distribution (gain 1) | Test pulse mean value distribution (gain 6) | Test pulse mean value distribution (gain 12) |
+| !{width: 300px;}testpulse/G1_RMS_EB.1D.png!:testpulse/G1_RMS_EB.1D.png | !{width: 300px;}testpulse/G6_RMS_EB.1D.png!:testpulse/G6_RMS_EB.1D.png | !{width: 300px;}testpulse/G12_RMS_EB.1D.png!:testpulse/G12_RMS_EB.1D.png |
+| Test pulse rms distribution (gain 1) | Test pulse rms distribution (gain 6) | Test pulse rms distribution (gain 12) |
+
+h2. TEST PULSE EE ANALYSIS <a name="h2_6"/> <a href="#top">↑</a>
+
+
+|=. Channel statistics (EE)
+|_. &nbsp; |_. Gain 1 |_. Gain 6 |_. Gain 12 |
+|:\4. 150 | 180 |
+| Missing channels | 175 | 175 | 175 |
+| Active channels | 14473 | 14473 | 14473 |
+
+|=. Classes of Test Pulse problematic channels
+|_. &nbsp;                                    |_. Count |_. Short name            |
+| Dead TP channels                            |     0 | DTPG1                   |
+| Low TP amplitude                            |     0 | STPG1                   |
+| Large TP amplitude                          |     0 | LTPG1                   |
+| Dead TP channels                            |     0 | DTPG6                   |
+| Low TP amplitude                            |     0 | STPG6                   |
+| Large TP amplitude                          |     0 | LTPG6                   |
+| Dead TP channels                            |     0 | DTPG12                  |
+| Low TP amplitude                            |     0 | STPG12                  |
+| Large TP amplitude                          |     0 | LTPG12                  |
+
+|=. Statistics by FLAGS
+|_. Flag |_. Number of channels |
+| DTPG1    |     0 |
+| STPG1    |     0 |
+| LTPG1    |     0 |
+| DTPG6    |     0 |
+| STPG6    |     0 |
+| LTPG6    |     0 |
+| DTPG12   |     0 |
+| STPG12   |     0 |
+| LTPG12   |     0 |
+
+h3. Plots <a name="h3_4"/> <a href="#top">↑</a>
+
+
+table(imgtab).
+|:\3. 300
+| !{width: 300px;}testpulse/G1_MEAN_EE.1D.png!:testpulse/G1_MEAN_EE.1D.png | !{width: 300px;}testpulse/G6_MEAN_EE.1D.png!:testpulse/G6_MEAN_EE.1D.png | !{width: 300px;}testpulse/G12_MEAN_EE.1D.png!:testpulse/G12_MEAN_EE.1D.png |
+| Test pulse mean value distribution (gain 1) | Test pulse mean value distribution (gain 6) | Test pulse mean value distribution (gain 12) |
+| !{width: 300px;}testpulse/G1_RMS_EE.1D.png!:testpulse/G1_RMS_EE.1D.png | !{width: 300px;}testpulse/G6_RMS_EE.1D.png!:testpulse/G6_RMS_EE.1D.png | !{width: 300px;}testpulse/G12_RMS_EE.1D.png!:testpulse/G12_RMS_EE.1D.png |
+| Test pulse rms distribution (gain 1) | Test pulse rms distribution (gain 6) | Test pulse rms distribution (gain 12) |
+
+h2. Test pulse maps <a name="h2_7"/> <a href="#top">↑</a>
+
+
+table(imgtab).
+|:\3. 300
+| !{width: 300px;}testpulse/G1_MEAN.2D.png!:testpulse/G1_MEAN.2D.png | !{width: 300px;}testpulse/G6_MEAN.2D.png!:testpulse/G6_MEAN.2D.png | !{width: 300px;}testpulse/G12_MEAN.2D.png!:testpulse/G12_MEAN.2D.png |
+| Test pulse mean value map (gain 1) | Test pulse mean value map (gain 6) | Test pulse mean value map (gain 12) |
+| !{width: 300px;}testpulse/G1_RMS.2D.png!:testpulse/G1_RMS.2D.png | !{width: 300px;}testpulse/G6_RMS.2D.png!:testpulse/G6_RMS.2D.png | !{width: 300px;}testpulse/G12_RMS.2D.png!:testpulse/G12_RMS.2D.png |
+| Test pulse rms map (gain 1) | Test pulse rms map (gain 6) | Test pulse rms map (gain 12) |
 
 h1. LASER ANALYSIS <a name="h1_4"/> <a href="#top">↑</a>
 
@@ -159,9 +253,9 @@ h1. Problematic Channels Summary for EB <a name="h1_5"/> <a href="#top">↑</a>
 
  |_\2. Problem classes ("at least")  |_. Number of channels  |
 | Pedestals problems | PE | 60731 |
-| Test Pulse problems | TP | No Data |
+| Test Pulse problems | TP | 0 |
 | Laser problems | LA | No Data |
-| Pedestals problems + Test Pulse problems | PE+TP | Not Enough Data |
+| Pedestals problems + Test Pulse problems | PE+TP | 0 |
 | Pedestals problems + Laser problems | PE+LA | Not Enough Data |
 | Test Pulse problems + Laser problems | TP+LA | Not Enough Data |
 | Pedestals problems + Test Pulse problems + Laser problems | PE+TP+LA | Not Enough Data |
@@ -173,10 +267,10 @@ h1. Problematic Channels Summary for EE <a name="h1_6"/> <a href="#top">↑</a>
 
  |_\2. Problem classes ("at least")  |_. Number of channels  |
 | Pedestals problems | PE | 60731 |
-| Test Pulse problems | TP | No Data |
+| Test Pulse problems | TP | 0 |
 | Laser problems | LA | No Data |
 | High voltage problems | HV | No Data |
-| Pedestals problems + Test Pulse problems | PE+TP | Not Enough Data |
+| Pedestals problems + Test Pulse problems | PE+TP | 0 |
 | Pedestals problems + Laser problems | PE+LA | Not Enough Data |
 | Pedestals problems + High voltage problems | PE+HV | Not Enough Data |
 | Test Pulse problems + Laser problems | TP+LA | Not Enough Data |
@@ -269,4 +363,4 @@ h2. Description of Laser Pulse errors:
 * LLERRO: MEAN > AVG * 0.1 and RMS / MEAN > 0.1 # AVG per subdetector
 
 
-p. Elapsed time: 0:01:01.537443
+p. Elapsed time: 0:02:30.409046
