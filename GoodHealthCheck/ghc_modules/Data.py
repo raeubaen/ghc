@@ -47,7 +47,7 @@ class Data(object):
       self.ghc_id = res[0]
       self.can_redo = True
     else:
-      self.cur.execute("INSERT INTO ghc (ghc_id, ghc, classified) VALUES (%s, %s, %s)", (1, 1, False))
+      self.cur.execute("INSERT INTO ghc (ghc_id, ghc, classified) VALUES (%s, %s, %s)", (ghc_id, ghc_id, False))
       self.cur.execute("SELECT ghc FROM ghc WHERE ghc_id=%s", (ghc_id,))
       self.ghc_id = self.cur.fetchone()[0]
       self.can_redo = False
@@ -355,14 +355,14 @@ class Data(object):
         if rms > badlimits[1] and mean > deadlimits[0]:
           tmpflags.append('VLR' + gain)
         if abs(mean - 200) >= 30 and mean > deadlimits[0]:
-          tmpflags.append('BP' + gain)
+          tmpflags.append('BP' +  gain)
       return tmpflags
 
     flags = []
     if getSubDetector(channel) == 'EB':
-      limits = {'G1': ((1, 0.2), (1.1, 3)), 'G6': ((1, 0.4), (1.3, 4)), 'G12': ((1, 0.5), (2.1, 6))}
+      limits = {'G1': ((1, 0.2), (5, 10)), 'G6': ((1, 0.4), (5, 10)), 'G12': ((1, 0.5), (5, 10))}
     else:
-      limits = {'G1': ((1, 0.2), (1.5, 4)), 'G6': ((1, 0.4), (2, 5)), 'G12': ((1, 0.5), (3.2, 7))}
+      limits = {'G1': ((1, 0.2), (5, 10)), 'G6': ((1, 0.4), (5, 10)), 'G12': ((1, 0.5), (5, 10))}
     flags += PedestalComparison('G1', limits['G1'][0], limits['G1'][1])
     flags += PedestalComparison('G6', limits['G6'][0], limits['G6'][1])
     flags += PedestalComparison('G12', limits['G12'][0], limits['G12'][1])
