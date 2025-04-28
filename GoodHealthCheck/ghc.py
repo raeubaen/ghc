@@ -2,7 +2,7 @@
 # coding=utf-8
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
-
+import pandas as pd
 import argparse
 import codecs
 import copy
@@ -32,7 +32,7 @@ parser.add_argument('-poff', help="Pedestal HV OFF runs numbers or list of files
 parser.add_argument('-tp', help="Test Pulse runs numbers or list of files", dest='tp_runs')
 parser.add_argument('-l', help="Laser runs or list of files", dest='l_runs')
 parser.add_argument('-lt', '--lasertable', help="Laser table to use in Oracle DB", dest='lasertable',
-                    default="MON_LASER_BLUE_DAT", metavar="TABLE")
+                    default="", metavar="TABLE")
 parser.add_argument('-o', '--output', help="Results directory (default: <ghc_id> or <ghc_id>_keep)", dest='output',
                     metavar="DIRECTORY")
 parser.add_argument('-r', '--redo', help="Redo existing GHC. Specify twice to re-classify channels.", dest='redo',
@@ -130,8 +130,10 @@ if args.redo is None:
         GHC.readData(source, runs=args.tp_runs.split(), data_type="testpulse")
     if args.l_runs is not None:
         logging.info("Laser...")
+        for run in args.l_runs.split():
+            laser_df = pd.DataFrame({'run': [int(run)], 'dataset': ['/Global/Online/ALL/']})
+        laser_df.to_csv('laser-proc/runlist.csv', index=False) 
         GHC.readData(source, runs=args.l_runs.split(), data_type="laser", lasertable=args.lasertable)
-
 if args.redo == 2:
     logging.warning("Channels will be reclassified")
     GHC.resetFlags()
@@ -540,7 +542,7 @@ if not args.noplots:
             ### laser plots
             h = plotter.get1DHistogram(key=("APD_{0}".format(plottype)).upper(), det=d,
                                        name="Laser {0} ({1})".format(plottype, args.lasertable))
-            plotter.saveHistogram(h, outputdir + "/laser/Laser_{0}_{1}.1D.{2}".format(plottype.upper(), d, ext))
+            plotter.saveHistogram(h, outputdir + "/laser/LASER_{0}_{1}.1D.{2}".format(plottype.upper(), d, ext))
 
             h = plotter.get1DHistogram(key="APD_OVER_PN_{0}".format(plottype), det=d,
                                        name="APD/PN {0} ({1})".format(plottype, args.lasertable))

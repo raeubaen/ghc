@@ -3,14 +3,12 @@ import inspect
 import itertools
 import logging
 import sys
+import subprocess
 from collections import defaultdict
-
 from collections.abc import Iterable
 
 import sqlite3
-
 import psycopg2
-
 import connection
 import Settings
 
@@ -20,7 +18,7 @@ from psycopg2.extras import execute_values
 
 # Load the CSV into a DataFrame    
 ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
-df = pd.read_csv(ecalchannels_path, header=None)
+df = pd.read_csv(ecalchannels_path, header=0)
     
 logger = logging.getLogger()
 
@@ -644,9 +642,11 @@ class Data(object):
     if lasertable:
       logger.info("Table {0} will be user as source for Laser data".format(lasertable))
     ## else:
-    if len(runs) == 1:
+    if 'laser' in data_type:
+        runs = runs
+    elif len(runs) == 1:
       runs = "G12:{0} G6:{0} G1:{0}".format(runs[0]).split()
-
+    
     logger.info("Trying to connect to Oracle")
     c = connection.Connection()
     if c._oradbh is None:
@@ -672,6 +672,8 @@ class Data(object):
         (run,)).fetchone()
       if res:
         iov = res[0]
+      elif True:
+        iov = None
       else:
         logger.error("IOV not found for run {0}".format(run))
         cur.close()
@@ -694,18 +696,31 @@ class Data(object):
         logger.error("Unknown table: {0}".format(data_type))
         cur.close()
         return
+      if "laser" not in data_type or lasertable:
+        result = c._oradbh.cursor().execute(sql, (iov,))
+      else:
+        subprocess.run([
+            "python3", 
+            "laser-proc/main.py", 
+            "laser-proc/runlist.csv", 
+            "/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/"
+        ])
+        fields = ['APD_MEAN', 'APD_OVER_PN_MEAN', 'APD_RMS']
+        apd_mean = pd.read_csv(f"/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/LT_Amp_{run}.csv", header=0)
+        apd_over_pn_mean = pd.read_csv(f"/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/LT_AmpOverPN_{run}.csv", header=0)
+        apd_rms = pd.read_csv(f"/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/LT_RMS_{run}.csv", header=0)
+        result = merge(apd_mean, apd_over_pn_mean, apd_rms)
 
       cur.close()
       cur = self.dbh.cursor()
-      result = c._oradbh.cursor().execute(sql, (iov,))
       cur.execute("INSERT INTO runs VALUES (%s, %s, %s, %s)", (self.ghc_id, run, data_type, gain))
      
       counter = 0
       value_rows = []
       for row in result:
         for k in range(len(fields)):
-            #cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s (SELECT keyid FROM valuekeys WHERE key=%(key)s), %(value)s)", {'ghc': self.ghc_id, 'dbid': row[0], 'key': fields[k], 'value': row[k + 1]})
-          value_rows.append((self.ghc_id, row[0], self.valuekeysDict[fields[k]], row[k + 1]))        
+        #cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s (SELECT keyid FROM valuekeys WHERE key=%(key)s), %(value)s)", {'ghc': self.ghc_id, 'dbid': row[0], 'key': fields[k], 'value': row[k + 1]})
+          value_rows.append((self.ghc_id, row[0], self.valuekeysDict[fields[k]], row[k + 1]))      
           counter += 1
       if value_rows:
         insert_query = """
@@ -715,7 +730,7 @@ class Data(object):
         execute_values(cur, insert_query, value_rows)
         logger.info("Exported {0} records".format(counter))
         self.dbh.commit()
-
+    
   def readDataFromFile(self, datatype, files):
     """
       Read data from file called 'source'
@@ -976,6 +991,16 @@ def det_to_sql(det):
     return det
   return '2%' if det == 'EE' else ('1%' if det == 'EB' else '%')
 
+def merge(mean, over_pn_mean, rms):
+    df = pd.DataFrame({'dbid': [], 'mean': [], 'over_pn_mean': [], 'rms': []})
+    df['dbid'] = mean['label'].str.extract(r'(\d+)$')[0]
+    df['mean'] = mean['value'].values
+    df['over_pn_mean'] = over_pn_mean['value'].values
+    df['rms'] = rms['value'].values
+    
+    df['dbid'] = df['dbid'].astype(int)
+
+    return df.values
 
 def is_iterable(thing):
   return isinstance(thing, Iterable) and not isinstance(thing, str)
