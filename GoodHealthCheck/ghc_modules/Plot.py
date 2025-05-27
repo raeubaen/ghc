@@ -1,6 +1,6 @@
 import ROOT
 import logging
-
+import os
 from pfgutils import plotECAL
 
 
@@ -32,12 +32,12 @@ class Plotter(object):
         else:
           dimx = ((1000, 4000), (0, 20))[use_rms]
       elif key.startswith('PED'):
-        dimx = ((150, 250), (0, 5))[use_rms]
+        dimx = ((150, 400), (0, 5))[use_rms]
       else:  # Laser
         if "OVER" in key:
-          dimx = ((0, 5), (0, 0.1))[use_rms]
+          dimx = ((0, 6), (0, 0.1))[use_rms]
         else:
-          dimx = ((0, 6000), (0, 5))[use_rms]
+          dimx = ((0, 6000), (0, 120))[use_rms]
 
     hist = ROOT.TH1F(name, name, 100, dimx[0], dimx[1])
     hist.SetXTitle("{0} (ADC counts)".format(("Mean", "RMS")[use_rms]))
@@ -77,7 +77,7 @@ class Plotter(object):
     if key.startswith('PED_ON'):
       lim['ee'] = {True: {"G1": (0.3, 0.8), "G6": (0.7, 1.5), "G12": (1.2, 3.4)},
                    False: {"G1": (160, 240), "G6": (160, 240), "G12": (160, 240)}}
-      lim['eb'] = {True: {"G1": (0.3, 0.8), "G6": (0.4, 1.1), "G12": (0.8, 2.2)},
+      lim['eb'] = {True: {"G1": (0.3, 0.8), "G6": (0.4, 3.0), "G12": (0.8, 6.0)},
                    False: {"G1": (160, 240), "G6": (160, 240), "G12": (160, 240)}}
     elif key.startswith('PED_OFF'):
       lim['ee'] = {True: {"G1": (0.3, 0.8), "G6": (0.7, 1.5), "G12": (1.2, 3.0)},
@@ -86,7 +86,7 @@ class Plotter(object):
                    False: {"G1": (160, 240), "G6": (160, 240), "G12": (160, 240)}}
     elif key.startswith('ADC'):
       lim['ee'] = {True: {"G1": (0, 12), "G6": (0, 6), "G12": (0, 6)},
-                   False: {"G1": (2000, 3500), "G6": (2000, 3000), "G12": (2000, 3000)}}
+                   False: {"G1": (3000, 4500), "G6": (3000, 4500), "G12": (3000, 4500)}}
       lim['eb'] = {True: {"G1": (0, 10), "G6": (0, 4), "G12": (0, 3)},
                    False: {"G1": (1400, 3000), "G6": (1400, 3000), "G12": (1400, 3000)}}
     else:
@@ -123,11 +123,14 @@ class Plotter(object):
     #return hist
 
   @staticmethod
-  def saveHistogram(histogram, filename):
+  def saveHistogram(histogram, filename, formats=None):
     """
-      Save <histogram> (TH1F or TCanvas) into filename according to <plottype>
-      plottype = 'EE' | 'EB'
+      Save <histogram> (TH1F or TCanvas) into filename according to formats
+      formats = list of formats to save (e.g. ['png', 'root'])
     """
+    if formats is None:
+      formats = ['png', 'root']
+      
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
     try:
       if not histogram:
@@ -135,22 +138,6 @@ class Plotter(object):
         return
       if isinstance(histogram, ROOT.TCanvas):  # type(histogram) is ROOT.TCanvas:
         c = histogram
-#        # return
-#        histogram.Draw("colz")
-#        c.SetGridx(True)
-#        c.SetGridy(True)
-#        ROOT.gStyle.SetOptStat("e")
-#        ROOT.gStyle.SetTickLength(0.01, "xy")
-#        if plottype == "EB":
-#            drawEBNumbers()
-#        elif plottype == "EE":
-#            c.SetCanvasSize(1000, 500)
-#            lines = []
-#            for p in getEELines():
-#                lines.append(DrawLine(p[0], p[1]))
-#            for i in lines:
-#                i.Draw()
-#            getEENumbers()
       else:
         c = ROOT.TCanvas()
         c.SetLogy()
@@ -160,8 +147,33 @@ class Plotter(object):
         ROOT.gStyle.SetOptStat("emruo")
         c.Update()
 
-      c.SaveAs(filename)
-      return True
+      success = True
+      for fmt in formats:
+        try:
+          c.SaveAs(f"{filename}.{fmt}")
+        except Exception:
+          logging.exception(f"Cannot save '{repr(histogram)}' into {filename}.{fmt}")
+          success = False
+      return success
     except Exception:
-      logging.exception("Cannot save '%s'into %s".format(repr(histogram), filename))
+      logging.exception(f"Cannot process histogram for {filename}")
       return False
+
+  @staticmethod
+  def printRootLinks(outputdir, out_stream):
+    """
+    Walks each plot subfolder and writes Textile links for every .root file.
+    """
+    for sub in ('pedestals_hvon', 'pedestals_hvoff', 'testpulse', 'laser'):
+      folder = os.path.join(outputdir, sub)
+      if not os.path.isdir(folder):
+        continue
+
+      print(f"h3. {sub} ROOT files", file=out_stream)
+      print("", file=out_stream)
+
+      for fn in sorted(os.listdir(folder)):
+        if fn.endswith('.root'):
+          rel = f"{sub}/{fn}"
+          print(f"\"{fn}\":{rel}", file=out_stream)
+      print("", file=out_stream)
