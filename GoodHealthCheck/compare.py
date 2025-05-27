@@ -11,7 +11,7 @@ import sys
 from collections import OrderedDict
 
 # noinspection PyUnresolvedReferences
-import pfgutils.connection
+import connection
 import pfgutils.textile
 import textile2html
 from ghc_modules import Data
@@ -30,7 +30,7 @@ def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
 
 logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s')
 
-pfgutils.connection.connect(oracle=True, chanstat=True)
+connection.connect(oracle=True, chanstat=True)
 
 footer = """h1. Description of errors
 

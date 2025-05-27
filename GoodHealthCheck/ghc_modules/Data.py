@@ -3,20 +3,23 @@ import inspect
 import itertools
 import logging
 import sys
+import subprocess
 from collections import defaultdict
-
 from collections.abc import Iterable
-
 import sqlite3
-
 import psycopg2
+import connection
+import Settings
+import json
+import pandas as pd
+import time
+from psycopg2.extras import execute_values
+from thresholds import CONFIG
 
-import pfgutils.connection
-from pfgutils import Settings
-
-# chdb = pfgutils.connection.ecalchannels
-# cur_chdb = chdb.cursor()
-
+# Load the CSV into a DataFrame    
+ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
+df = pd.read_csv(ecalchannels_path, header=0)
+    
 logger = logging.getLogger()
 
 
@@ -27,30 +30,23 @@ class Data(object):
   PEDESTAL_FLAGS = ['DP', 'BP', 'LR', 'VLR']
   HV_FLAGS = ['BV']
   TESTPULSE_FLAGS = ['DTP', 'STP', 'LTP']
-  LASER_FLAGS = ['DLAMPL', 'SLAMPL', 'LLERRO']
+  LASER_FLAGS = ['DLAMPL', 'SLAMPL', 'LLERRO', 'DLAMPL_OVERPN', 'SLAMPL_OVERPN']
+
 
   def __init__(self, ghc_id, keep):
-
-    self.dbh = conn = sqlite3.connect("database.db")
-
-    '''
-    psycopg2.connect(
-      "host='{host}' dbname='ecalghc' user='{user}' password='{password}'".format(
-        host=Settings.Database['options']['host'],
-        user=Settings.Database['options']['user'],
-        password=Settings.Database['options']['password'],
-      ))
-    '''
-
+    """
+      Constructor for Data object
+    """    
+    self.dbh = conn = psycopg2.connect("postgresql://postgres:cp0psuvqQ7CBLYJE@db.yrugopcygvlzarsywqrp.supabase.co:5432/postgres")
     self.cur = self.dbh.cursor()
-
     self.cur.execute(f"SELECT ghc FROM ghc WHERE ghc_id={ghc_id}")
     res = self.cur.fetchone()
+    
     if res is not None:
       self.ghc_id = res[0]
       self.can_redo = True
     else:
-      self.cur.execute("INSERT INTO ghc (ghc_id) VALUES (%s)", (ghc_id,))
+      self.cur.execute("INSERT INTO ghc (ghc_id, ghc, classified) VALUES (%s, %s, %s)", (ghc_id, ghc_id, False))
       self.cur.execute("SELECT ghc FROM ghc WHERE ghc_id=%s", (ghc_id,))
       self.ghc_id = self.cur.fetchone()[0]
       self.can_redo = False
@@ -64,49 +60,77 @@ class Data(object):
     self._has_testpulse = None
     self._has_laser = None
 
+    self.channel_data_cache = {}
+    self.channel_flag_cache = {}
     self.updateEcalChannelFlags()
+    self.valuekeysDict = self.valuekeysDict()
 
   def updateEcalChannelFlags(self):
-#
-#    logger.info("Getting list of masked ecal channels")
-#    dbhst = psycopg2.connect(
-#      "host='{host}' dbname='ecalchannelstatus' user='{user}' password='{password}'".format(
-#        host=Settings.Database['options']['host'],
-#        user=Settings.Database['options']['user'],
-#        password=Settings.Database['options']['password'],
-#      ))
-#
-#    curst = dbhst.cursor()
-#
-#    curst.execute("SELECT dbid FROM ecalchannelstatus WHERE status > %s and \
-#      iov = (select max(iov) from ecalchannelstatus) and tag=%s",
-#                  (Settings.max_good_status, 'EcalChannelStatus_v1_hlt'))
-#
+##
+##    logger.info("Getting list of masked ecal channels")
+##    dbhst = psycopg2.connect(
+##      "host='{host}' dbname='ecalchannelstatus' user='{user}' password='{password}'".format(
+##        host=Settings.Database['options']['host'],
+##        user=Settings.Database['options']['user'],
+##        password=Settings.Database['options']['password'],
+##      ))
+##
+##    curst = dbhst.cursor()
+##
+##    curst.execute("SELECT dbid FROM ecalchannelstatus WHERE status > %s and \
+##      iov = (select max(iov) from ecalchannelstatus) and tag=%s",
+##                  (Settings.max_good_status, 'EcalChannelStatus_v1_hlt'))
+##
     self.masked_channels = () #tuple(c[0] for c in curst)
+
+  def valuekeysDict(self, reverse=False):
+    """
+      Return valuekeys dictionary
+    """
+    valuekeysDict = {}
+    if not reverse:
+      with open(r'/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/VALUEKEYS.txt', 'r') as f:
+        for line in f:
+          valuekeysDict[line.strip().split()[0]] = line.strip().split()[1] 
+    else:
+      with open(r'/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/VALUEKEYS.txt', 'r') as f:
+        for line in f:
+          valuekeysDict[line.strip().split()[1]] = line.strip().split()[0] 
+    return valuekeysDict 
 
   @staticmethod
   def getAllChannels(det='ALL'):
     """
       Return list of all channels
     """
-    cur_chdb = pfgutils.connection.ecalchannels.cursor()
-    if pfgutils.connection.ecalchannelsdb != "sqlite3":
-        cur_chdb.execute("SELECT dbid FROM channels WHERE dbid::text  LIKE %s", (det_to_sql(det),))
+    channels = df[17].astype(str)
+    
+    if len(det) == 2:
+        det_column = df[26].astype(str).str[:2]
     else:
-        cur_chdb.execute("SELECT dbid FROM channels WHERE dbid LIKE ?", (det_to_sql(det),))
-    return [c['dbid'] for c in cur_chdb]
+        det_column = df[26].astype(str)
+
+    if det != 'ALL':
+        channels = channels[det_column == det]
+    
+    return channels.tolist()
+
 
   @staticmethod
   def getNumOfAllChannels(det='ALL'):
     """
       Return number of channels in a given subdetector
     """
-    cur_chdb = pfgutils.connection.ecalchannels.cursor()
-    if pfgutils.connection.ecalchannelsdb != "sqlite3":
-        cur_chdb.execute("SELECT COUNT(dbid) FROM channels WHERE dbid::text LIKE %s", (det_to_sql(det),))
+    if len(det) == 2:
+        det_column = df[26].astype(str).str[:2]
     else:
-        cur_chdb.execute("SELECT COUNT(dbid) FROM channels WHERE dbid LIKE ?", (det_to_sql(det),))
-    return list(cur_chdb.fetchone().values())[0]
+        det_column = df[26].astype(str)
+
+    if det == 'ALL':
+        count = len(det_column)
+    else:
+        count = (det_column == det).sum()
+    return count
 
   @property
   def isClassified(self):
@@ -137,13 +161,13 @@ class Data(object):
 
   def getInactiveChannels(self, det, datatype=None):
     """
-    Returns list of inactive channel
-    :param det: subdetector
-    :param datatype: data type
-    :return: tuple
+      Returns list of inactive channel
+      :param det: subdetector
+      :param datatype: data type
+      :return: tuple
     """
     if datatype is not None and not self.have_datatype(datatype):
-      return tuple()
+        return tuple()
 
     return tuple(set(self.getAllChannels(det=det)) - set(self.getActiveChannels(det=det, datatype=datatype)))
 
@@ -170,13 +194,11 @@ class Data(object):
     else:
       filter_sql = ""
 
-    # if not self.keep_bad:
-    #      filter_sql += " AND (SELECT status FROM channelstatus WHERE channelstatus.dbid = flags.dbid) < 3"
-
+    ## if not self.keep_bad:
+    ##      filter_sql += " AND (SELECT status FROM channelstatus WHERE channelstatus.dbid = flags.dbid) < 3"
     self.cur.execute(
       "SELECT DISTINCT flags.dbid FROM flags WHERE ghc=%(ghc)s {0} ORDER BY flags.dbid".format(filter_sql),
       {'ghc': self.ghc_id})
-
     return [c[0] for c in self.cur if not self.isMasked(c[0])]
 
   def getNumOfProblematicChannels(self, without_missing=False):
@@ -204,8 +226,8 @@ class Data(object):
       sql_items = []
       values = {'ghc': self.ghc_id, 'det': det_to_sql(det)}
       for i, d in enumerate(datatype):
-        sql_items.append("key LIKE %(datatype{0})s".format(i))
-        values['datatype{0}'.format(i)] = d
+        sql_items.append("values.keyid::text LIKE %(datatype{0})s".format(i))
+        values['datatype{0}'.format(i)] = self.valuekeysDict[d]
 
       sql = "SELECT DISTINCT dbid FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) " \
             "WHERE ghc=%(ghc)s AND ({0}) AND dbid::text LIKE %(det)s".format(" OR ".join(sql_items))
@@ -214,8 +236,8 @@ class Data(object):
     else:
       sql = self.cur.mogrify(
         "SELECT DISTINCT dbid FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) "
-        "WHERE ghc=%(ghc)s AND key LIKE %(datatype)s AND dbid::text LIKE %(det)s",
-        {'ghc': self.ghc_id, 'datatype': datatype, 'det': det_to_sql(det)})
+        "WHERE ghc=%(ghc)s AND values.keyid::text LIKE %(datatype)s AND dbid::text LIKE %(det)s",
+        {'ghc': self.ghc_id, 'datatype': self.valuekeysDict[datatype], 'det': det_to_sql(det)})
       # logger.debug("getActiveChannels: %s", sql)
       self.cur.execute(sql)
     return [c[0] for c in self.cur if not self.isMasked(c[0])]
@@ -246,8 +268,36 @@ class Data(object):
     self.cur.execute("DELETE FROM missed_channels WHERE ghc=%s", (self.ghc_id,))
     self.isClassified = False
     self.dbh.commit()
+  
+  def getAllChannelData(self):
+    """
+    Combine queries to get all relevant dbid and channel data in one go.
+    """
+    if self.channel_data_cache:
+        return 
+    query = """
+        SELECT dbid, key, value 
+        FROM values 
+        INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid)
+        WHERE ghc = %s 
+    """
+    self.cur.execute(query, (self.ghc_id,))
+    rows = self.cur.fetchall()
 
+    for dbid, key, value in rows:
+        if dbid not in self.channel_data_cache:
+            self.channel_data_cache[dbid] = {}
+        self.channel_data_cache[dbid][key] = value
+  
   def getChannelData(self, channel, key=None):
+    """
+    Optimized version of getChannelDataOld using cache
+    """
+    if channel in self.channel_data_cache:
+        return self.channel_data_cache[channel].get(key, None)
+    return None
+  
+  def getChannelDataOld(self, channel, key=None):
     """
       Returns channel's value for channels
       If additional keys ('key' and 'datatype') are specified -- return value
@@ -279,43 +329,191 @@ class Data(object):
         return None
     else:
       result = {}
-      for k in key:  # TODO: is this used?
-        # itertools.product(key):
+      for k in key:  ## TODO: is this used?
+        ## itertools.product(key):
         result[k] = self.getChannelData(k)
 
       return result
 
+  def PedestalComparison(self, channel, gain, det):
+    tmpflags = []
+    mean = self.getChannelData(channel, key='PED_ON_MEAN_' + gain)
+    rms = self.getChannelData(channel, key='PED_ON_RMS_' + gain)
+    if mean is None or rms is None:
+      return []
+    if mean <= CONFIG[det]['DP'][gain][0] or rms <= CONFIG[det]['DP'][gain][1]:
+      tmpflags.append('DP' + gain)
+    else:
+      if CONFIG[det]['LR'][gain][0] <= rms < CONFIG[det]['LR'][gain][1] and mean > CONFIG[det]['LR'][gain][2]:
+        tmpflags.append('LR' + gain)
+      if rms > CONFIG[det]['VLR'][gain][0] and mean > CONFIG[det]['VLR'][gain][1]:
+        tmpflags.append('VLR' + gain)
+      if abs(mean - CONFIG[det]['BP'][0]) >= CONFIG[det]['BP'][1] and mean > CONFIG[det]['BP'][2]:
+        tmpflags.append('BP' +  gain)
+    return tmpflags
+ 
   def getPedestalFlags(self, channel):
     """
       Returns flags for pedestal channels
     """
-
-    def PedestalComparison(gain, deadlimits, badlimits):
-      tmpflags = []
-      mean = self.getChannelData(channel, key='PED_ON_MEAN_' + gain)
-      rms = self.getChannelData(channel, key='PED_ON_RMS_' + gain)
-      if mean is None or rms is None:
-        return []
-      if mean <= deadlimits[0] or rms <= deadlimits[1]:
-        tmpflags.append('DP' + gain)
-      else:
-        if badlimits[0] <= rms < badlimits[1] and mean > deadlimits[0]:
-          tmpflags.append('LR' + gain)
-        if rms > badlimits[1] and mean > deadlimits[0]:
-          tmpflags.append('VLR' + gain)
-        if abs(mean - 200) >= 30 and mean > deadlimits[0]:
-          tmpflags.append('BP' + gain)
-      return tmpflags
-
-    flags = []
-    if getSubDetector(channel) == 'EB':
-      limits = {'G1': ((1, 0.2), (1.1, 3)), 'G6': ((1, 0.4), (1.3, 4)), 'G12': ((1, 0.5), (2.1, 6))}
-    else:
-      limits = {'G1': ((1, 0.2), (1.5, 4)), 'G6': ((1, 0.4), (2, 5)), 'G12': ((1, 0.5), (3.2, 7))}
-    flags += PedestalComparison('G1', limits['G1'][0], limits['G1'][1])
-    flags += PedestalComparison('G6', limits['G6'][0], limits['G6'][1])
-    flags += PedestalComparison('G12', limits['G12'][0], limits['G12'][1])
+    flags = [
+      flag
+      for gain in ['G1', 'G6', 'G12']
+      for det  in ['EB', 'EE']
+      for flag in self.PedestalComparison(channel, gain, det)
+    ]
     return list(set(flags))
+  
+  def ped_hvon(self):
+    self.cur.execute("SELECT DISTINCT dbid FROM values WHERE ghc = %s AND keyid::text LIKE %s", (self.ghc_id, '10__'))
+    flag_rows = []
+    dbids = [k[0] for k in self.cur]
+    self.getAllChannelData()        
+    for c in dbids:
+      for f in self.getPedestalFlags(c):
+        flag_rows.append((self.ghc_id, c, f))
+    if flag_rows:
+      insert_query = "INSERT INTO flags (ghc, dbid, flag) VALUES %s"
+      execute_values(self.cur, insert_query, flag_rows)
+
+  def testpulse(self):
+    for gain in ('G1', 'G6', 'G12'):
+      sql = "INSERT INTO flags SELECT ghc, dbid, %s FROM \"values\" " \
+            "INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) " \
+            "WHERE ghc = %s AND key = %s AND value = {0}".format(CONFIG['EB']['DTP'][0])
+      self.cur.execute(sql, ('DTP' + gain, self.ghc_id, 'ADC_MEAN_' + gain))
+      for det in ('EE', 'EB'):
+        l = det_to_sql(det)
+        self.cur.execute("SELECT AVG(value) FROM \"values\" INNER JOIN valuekeys "
+                         "ON (values.keyid = valuekeys.keyid) WHERE ghc = %s AND key = %s "
+                         "AND dbid::text LIKE %s", (self.ghc_id, 'ADC_MEAN_' + gain, l))
+        avg = self.cur.fetchone()[0]
+        if avg is None:
+          logger.info("No Testpulse data for gain %s and detector %s!", gain, det)
+          continue
+
+        sql = "INSERT INTO flags SELECT ghc, dbid, %s FROM \"values\" INNER JOIN valuekeys " \
+              "ON (values.keyid = valuekeys.keyid) WHERE ghc = %s AND key = %s AND value::numeric > {0} " \
+              "AND value::numeric <= {1} * {2} AND dbid::text LIKE %s".format(CONFIG[det]['STP'][0], CONFIG[det]['STP'][1], avg)
+        self.cur.execute(sql, ('STP' + gain, self.ghc_id, 'ADC_MEAN_' + gain, l))
+
+        sql = "INSERT INTO flags SELECT ghc, dbid, %s FROM \"values\" INNER JOIN valuekeys " \
+              "ON (values.keyid = valuekeys.keyid) WHERE ghc = %s AND key = %s " \
+              "AND value::numeric > {0} * {1} AND dbid::text LIKE %s".format(CONFIG[det]['LTP'][0], avg)
+        self.cur.execute(sql, ('LTP' + gain, self.ghc_id, 'ADC_MEAN_' + gain, l))
+
+  def ped_hvoff(self):
+    # pedestal HV OFF channels problems only for EB
+    cur_on = self.dbh.cursor()
+    cur_off = self.dbh.cursor()
+    pre = "^[BD]P"
+    for gain in ["G1", "G6", "G12"]:
+      data = defaultdict(lambda: [None, None])
+      sql_on = "SELECT dbid, value FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) WHERE " \
+               "ghc=%s AND key='PED_ON_RMS_{0}' AND dbid::text LIKE %s AND value::numeric > 0".format(gain)
+      cur_on.execute(sql_on, (self.ghc_id, '1%'))
+      for dbid, value in cur_on:
+        data[dbid][0] = float(value)
+
+      sql_off = "SELECT dbid, value FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) WHERE " \
+                "ghc=%s AND key='PED_OFF_RMS_{0}' AND dbid::text LIKE %s AND value::numeric > 0".format(gain)
+      cur_off.execute(sql_off, (self.ghc_id, '1%'))
+      for dbid, value in cur_off:
+        data[dbid][1] = float(value)
+
+      badchannels = []
+      for k, v in data.items():
+        if v[0] is None or v[1] is None:
+          #logger.info("Missing pedestal data for channel %d: PED_ON_RMS_G12 = %s, PED_OFF_RMS_G12 = %s", k, str(v[0]), str(v[1]))
+          continue
+        bv_threshold = CONFIG['EB']['BP'] if str(k)[0] == "1" else CONFIG['EE']['BP']
+        if abs(v[0] - v[1]) < bv_threshold[0] and bv_threshold[1] <= v[0] <= bv_threshold[2]:
+          # logger.debug("Potential HV problem: channel %s", k)
+          badchannels.append(k)
+        
+      for c in badchannels:
+        # logger.debug("Checking channel %s: HV problem", c)
+        self.cur.execute("SELECT flag FROM flags WHERE ghc = %s AND dbid = %s", (self.ghc_id, c))
+        # logger.debug("- Flags: %s", ",".join(x[0] for x in self.cur))
+        self.cur.execute("SELECT COUNT(dbid) FROM flags WHERE ghc = %s AND dbid = %s AND flag ~ %s",
+                         (self.ghc_id, c, pre))
+        ans = self.cur.fetchone()
+        # logger.debug("- Number of pedestal flags: %s", ans[0])
+        isgood = (ans[0] == 0)
+        if isgood:
+          # logger.debug("- Setting HV flag!")
+          self.cur.execute("INSERT INTO flags VALUES (%s, %s, %s)", (self.ghc_id, c, 'BV' + gain))
+      # else:
+          #   logger.debug("- Not setting HV flag")
+
+  def laser(self):
+    self.cur.execute(
+      "SELECT COUNT(DISTINCT(dbid)) FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) "
+      "WHERE ghc = %s AND (key = %s OR key = %s)", (self.ghc_id, 'APD_MEAN', 'APD_RMS'))
+    if self.cur.fetchone()[0] == 0:
+      raise RuntimeError("No laser data found")
+
+    for det in ("EB", "EE"):
+      l = det_to_sql(det)
+      sql = "INSERT INTO flags SELECT ghc, dbid, 'DLAMPL' FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) WHERE key = 'APD_MEAN' AND value <= {0} AND dbid::text LIKE %s".format(CONFIG[det]['DLAMPL'][0])
+      self.cur.execute(sql, (l,))
+
+      sql = "INSERT INTO flags SELECT ghc, dbid, 'DLAMPL_OVERPN' FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) WHERE key = 'APD_OVER_PN_MEAN' AND value <= {0} AND dbid::text LIKE %s".format(CONFIG[det]['DLAMPL_OVERPN'][0])
+      self.cur.execute(sql, (l,))
+
+      sql = "SELECT AVG(value) FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) WHERE " \
+            "ghc = %s AND key = 'APD_MEAN' AND value::numeric > 0 AND dbid::text LIKE %s"
+      self.cur.execute(sql, (self.ghc_id, l))
+      avg = self.cur.fetchone()[0]
+      sql = "INSERT INTO flags SELECT ghc, dbid, 'SLAMPL' FROM \"values\" INNER JOIN valuekeys " \
+            "ON (values.keyid = valuekeys.keyid) WHERE " \
+            "ghc = %s AND key = 'APD_MEAN' AND value::numeric < {0} * {1} AND value::numeric > {2} " \
+            "AND dbid::text like %s".format(avg, CONFIG[det]['SLAMPL'][1], CONFIG[det]['SLAMPL'][0])
+      self.cur.execute(sql, (self.ghc_id, l))
+
+      sql = """
+      INSERT INTO flags
+      SELECT dl1.ghc, dl1.dbid, 'LLERRO'
+        FROM "values" AS dl1
+        JOIN "values" AS dl2
+          ON dl1.dbid = dl2.dbid
+         AND dl1.ghc = dl2.ghc
+       WHERE dl1.keyid = (SELECT keyid FROM valuekeys WHERE key = %(key1)s)
+         AND dl2.keyid = (SELECT keyid FROM valuekeys WHERE key = %(key2)s)
+         AND dl1.ghc   = %(ghc)s
+         AND dl1.value::numeric > {0} * {1}
+         AND dl2.value::numeric / dl1.value::numeric > {2}
+         AND dl1.dbid::text like %(l)s
+      """.format(avg, CONFIG[det]['LLERRO'][0], CONFIG[det]['LLERRO'][1])
+      self.cur.execute(sql, {'key1': 'APD_MEAN', 'key2': 'APD_RMS', 'ghc': self.ghc_id, 'l': l})
+
+      sql = "SELECT AVG(value) FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) WHERE " \
+            "ghc = %s AND key = 'APD_OVER_PN_MEAN' AND value::numeric > 0 AND dbid::text LIKE %s"
+      self.cur.execute(sql, (self.ghc_id, l))
+      avg = self.cur.fetchone()[0]
+
+      sql = "INSERT INTO flags SELECT ghc, dbid, 'SLAMPL_OVERPN' FROM \"values\" INNER JOIN valuekeys " \
+            "ON (values.keyid = valuekeys.keyid) WHERE " \
+            "ghc = %s AND key = 'APD_OVER_PN_MEAN' AND value::numeric < {0} * {1} AND value::numeric > {2} " \
+            "AND dbid::text like %s".format(avg, CONFIG[det]['SLAMPL'][1], CONFIG[det]['SLAMPL'][0])
+      self.cur.execute(sql, (self.ghc_id, l))
+
+#      sql = """
+#      INSERT INTO flags
+#      SELECT dl1.ghc, dl1.dbid, 'LLERRO_OVERPN'
+#        FROM "values" AS dl1
+#        JOIN "values" AS dl2
+#          ON dl1.dbid = dl2.dbid
+#         AND dl1.ghc = dl2.ghc
+#       WHERE dl1.keyid = (SELECT keyid FROM valuekeys WHERE key = %(key1)s)
+#         AND dl2.keyid = (SELECT keyid FROM valuekeys WHERE key = %(key2)s)
+#         AND dl1.ghc   = %(ghc)s
+#         AND dl1.value::numeric > {0} * 0.1
+#         AND dl2.value::numeric / dl1.value::numeric > 0.2
+#         AND dl1.dbid::text like %(l)s
+#      """.format(avg)
+#      self.cur.execute(sql, {'key1': 'APD_OVER_PN__MEAN', 'key2': 'APD_OVER_PN_RMS', 'ghc': self.ghc_id, 'l': l})
+
 
   def classifyChannels(self):
     """
@@ -325,119 +523,11 @@ class Data(object):
     if self.isClassified:
       # logger.debug("Already classified.")
       return
-
     logger.info("Performing channel classification")
-    self.dbh.commit()
-
-    def testpulse():
-      for gain in ('G1', 'G6', 'G12'):
-        sql = "INSERT INTO flags SELECT ghc, dbid, %s FROM \"values\" " \
-              "INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) " \
-              "WHERE ghc = %s AND key = %s AND value = 0"
-        self.cur.execute(sql, ('DTP' + gain, self.ghc_id, 'ADC_MEAN_' + gain))
-        for det in ('EE', 'EB'):
-          l = det_to_sql(det)
-          self.cur.execute("SELECT AVG(value) FROM \"values\" INNER JOIN valuekeys "
-                           "ON (values.keyid = valuekeys.keyid) WHERE ghc = %s AND key = %s "
-                           "AND dbid::text LIKE %s", (self.ghc_id, 'ADC_MEAN_' + gain, l))
-          avg = self.cur.fetchone()[0]
-          if avg is None:
-            logger.info("No Testpulse data for gain %s and detector %s!", gain, det)
-            continue
-
-          sql = "INSERT INTO flags SELECT ghc, dbid, %s FROM \"values\" INNER JOIN valuekeys " \
-                "ON (values.keyid = valuekeys.keyid) WHERE ghc = %s AND key = %s AND value::numeric > 0 " \
-                "AND value::numeric <= 0.5 * {0} AND dbid::text LIKE %s".format(avg)
-          self.cur.execute(sql, ('STP' + gain, self.ghc_id, 'ADC_MEAN_' + gain, l))
-
-          sql = "INSERT INTO flags SELECT ghc, dbid, %s FROM \"values\" INNER JOIN valuekeys " \
-                "ON (values.keyid = valuekeys.keyid) WHERE ghc = %s AND key = %s " \
-                "AND value::numeric > 1.5 * {0} AND dbid::text LIKE %s".format(avg)
-          self.cur.execute(sql, ('LTP' + gain, self.ghc_id, 'ADC_MEAN_' + gain, l))
-
-    def ped_hvoff():
-      # pedestal HV OFF channels problems only for EB
-      cur_on = self.dbh.cursor()
-      cur_off = self.dbh.cursor()
-      pre = "^[BD]P"
-      # Botjo checks only G12 RMS
-      for gain in ["G12"]:
-        data = defaultdict(lambda: [None, None])
-        sql_on = "SELECT dbid, value FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) WHERE " \
-                 "ghc=%s AND key='PED_ON_RMS_G12' AND dbid::text LIKE %s AND value::numeric > 0"
-        cur_on.execute(sql_on, (self.ghc_id, '1%'))
-        for dbid, value in cur_on:
-          data[dbid][0] = float(value)
-
-        sql_off = "SELECT dbid, value FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) WHERE " \
-                  "ghc=%s AND key='PED_OFF_RMS_G12' AND dbid::text LIKE %s AND value::numeric > 0"
-        cur_off.execute(sql_off, (self.ghc_id, '1%'))
-        for dbid, value in cur_off:
-          data[dbid][1] = float(value)
-
-        badchannels = []
-        for k, v in data.items():
-          if v[0] is None or v[1] is None:
-            logger.info("Missing pedestal data for channel %d: PED_ON_RMS_G12 = %s, PED_OFF_RMS_G12 = %s",
-                        k, str(v[0]), str(v[1]))
-            continue
-
-          if abs(v[0] - v[1]) < 0.2:
-            # logger.debug("Potential HV problem: channel %s", k)
-            badchannels.append(k)
-
-        for c in badchannels:
-          # logger.debug("Checking channel %s: HV problem", c)
-          self.cur.execute("SELECT flag FROM flags WHERE ghc = %s AND dbid = %s", (self.ghc_id, c))
-          # logger.debug("- Flags: %s", ",".join(x[0] for x in self.cur))
-          self.cur.execute("SELECT COUNT(dbid) FROM flags WHERE ghc = %s AND dbid = %s AND flag ~ %s",
-                           (self.ghc_id, c, pre))
-          ans = self.cur.fetchone()
-          # logger.debug("- Number of pedestal flags: %s", ans[0])
-          isgood = (ans[0] == 0)
-          if isgood:
-            # logger.debug("- Setting HV flag!")
-            self.cur.execute("INSERT INTO flags VALUES (%s, %s, %s)", (self.ghc_id, c, 'BV' + gain))
-            # else:
-            #   logger.debug("- Not setting HV flag")
-
-    def laser():
-      self.cur.execute(
-        "SELECT COUNT(DISTINCT(dbid)) FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) "
-        "WHERE ghc = %s AND (key = %s OR key = %s)", (self.ghc_id, 'APD_MEAN', 'APD_RMS'))
-      if self.cur.fetchone()[0] == 0:
-        raise RuntimeError("No laser data found")
-
-      sql = "INSERT INTO flags SELECT ghc, dbid, 'DLAMPL' FROM \"values\" INNER JOIN valuekeys " \
-            "ON (values.keyid = valuekeys.keyid) WHERE key = 'APD_MEAN' AND value <= 0"
-      self.cur.execute(sql)
-      for l in ("1%", "2%"):
-        sql = "SELECT AVG(value) FROM \"values\" INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) WHERE " \
-              "ghc = %s AND key = 'APD_MEAN' AND value::numeric > 0 AND dbid::text LIKE %s"
-        self.cur.execute(sql, (self.ghc_id, l))
-        avg = self.cur.fetchone()[0]
-        sql = "INSERT INTO flags SELECT ghc, dbid, 'SLAMPL' FROM \"values\" INNER JOIN valuekeys " \
-              "ON (values.keyid = valuekeys.keyid) WHERE " \
-              "ghc = %s AND key = 'APD_MEAN' AND value::numeric < {0} * 0.1 AND value::numeric > 0 " \
-              "AND dbid::text like %s".format(avg)
-        self.cur.execute(sql, (self.ghc_id, l))
-
-        sql = "INSERT INTO flags SELECT dl1.ghc, dl1.dbid, 'LLERRO' FROM \"values\" AS dl1 " \
-              "INNER JOIN \"values\" AS dl2 ON dl1.dbid = dl2.dbid AND d1.ghc = d2.ghc " \
-              "WHERE dl1.keyid = (SELECT keyid FROM valuekeys WHERE key=%(key1)s) " \
-              "AND dl2.keyid = (SELECT keyid FROM valuekeys WHERE key=%(key2)s) " \
-              "AND d1.ghc = %(ghc)s " \
-              "AND dl1.value::numeric > {0} * 0.1 AND dl2.value::numeric / dl1.value::numeric > 0.2".format(avg)
-        self.cur.execute(sql, {'key1': 'APD_MEAN', 'key2': 'APD_RMS', 'ghc': self.ghc_id})
-
     logger.info("Classify Pedestal HV ON data ...")
     is_classified = True
     try:
-      self.cur.execute("SELECT DISTINCT dbid FROM values WHERE ghc = %s AND keyid::text LIKE %s",
-                       (self.ghc_id, '10__'))
-      for c in [k[0] for k in self.cur]:
-        for f in self.getPedestalFlags(c):
-          self.cur.execute("INSERT INTO flags VALUES (%s, %s, %s)", (self.ghc_id, c, f))
+      self.ped_hvon()
       self.dbh.commit()
       logger.info("Finished.")
     except Exception as e:
@@ -447,7 +537,7 @@ class Data(object):
       is_classified = False
     logger.info("Classify Test Pulse data ...")
     try:
-      testpulse()
+      self.testpulse()
       self.dbh.commit()
       logger.info("Finished.")
     except Exception as e:
@@ -457,7 +547,7 @@ class Data(object):
       is_classified = False
     logger.info("Classify Laser data ...")
     try:
-      laser()
+      self.laser()
       self.dbh.commit()
       logger.info("Finished.")
     except RuntimeError as e:
@@ -471,7 +561,7 @@ class Data(object):
       is_classified = False
     logger.info("Classify Pedestal HV OFF data ...")
     try:
-      ped_hvoff()
+      self.ped_hvoff()
       self.dbh.commit()
       logger.info("Finished.")
     except Exception as e:
@@ -485,7 +575,7 @@ class Data(object):
     try:
       missed_channels = set()
       for t in ['pedestal_hvon', 'testpulse']:
-        prefix = ("PED_ON", "ADC")[t == testpulse]
+        prefix = ("PED_ON", "ADC")[t == 'testpulse']
         for i, j in itertools.combinations(("G1", "G6", "G12"), 2):
           self.cur.execute("SELECT dbid FROM values "
                            "INNER JOIN valuekeys ON (values.keyid = valuekeys.keyid) "
@@ -517,15 +607,24 @@ class Data(object):
     self.isClassified = True
     self.dbh.commit()
 
+  def getFlagsForAllChannels(self):
+    self.classifyChannels()
+    query = "SELECT * FROM flags WHERE ghc = %s"
+    
+    self.cur.execute(query, (self.ghc_id,))
+    rows = self.cur.fetchall()
+    for ghc, dbid, flag in rows:
+        if dbid not in self.channel_flag_cache:
+            self.channel_flag_cache[dbid] = list()
+        self.channel_flag_cache[dbid].append(flag)
+ 
+
   def getFlagsForChannel(self, channel):
     if self.isMasked(channel):
       return []
-
-    self.classifyChannels()
-    self.cur.execute("SELECT flag FROM flags WHERE ghc = %s AND dbid = %s", (self.ghc_id, int(channel)))
-    return [f[0] for f in self.cur]
-
-  def getChannelsWithFlag(self, flags, exp="and", det=None):
+    channel = int(channel)
+    return self.channel_flag_cache.get(channel, [])
+  def getChannelsWithFlag(self, flags, exp="or", det=None):
     """
       Returns list of channels which has <flags> (string|list)
       exp = 'or' | 'and'
@@ -537,9 +636,8 @@ class Data(object):
       verb = ' INTERSECT '
     else:
       verb = ' UNION '
-
     if det:
-      sql_det = " AND dbid::text LIKE %(det)s"  # .format(det_to_sql(det))
+      sql_det = " AND dbid::text LIKE %(det)s"  ## .format(det_to_sql(det))
       values['det'] = det_to_sql(det)
     else:
       sql_det = ""
@@ -554,7 +652,6 @@ class Data(object):
       values['flag'] = flags
 
     logger.debug('SQL: %s', self.cur.mogrify(sql, values))
-
     self.cur.execute(sql, values)
     return [c[0] for c in self.cur if not self.isMasked(c[0])]
 
@@ -579,18 +676,21 @@ class Data(object):
       return
     if lasertable:
       logger.info("Table {0} will be user as source for Laser data".format(lasertable))
-    # else:
-    if len(runs) == 1:
+    ## else:
+    if 'laser' in data_type:
+        runs = runs
+    elif len(runs) == 1:
       runs = "G12:{0} G6:{0} G1:{0}".format(runs[0]).split()
-
+    
     logger.info("Trying to connect to Oracle")
-    if pfgutils.connection.oradbh is None:
+    c = connection.Connection()
+    if c._oradbh is None:
       logger.error("Requested source (Oracle) is not available!")
       return
 
     logger.info("OK")
     logger.info("Exporting data from Oracle to local DB ...")
-
+    
     for gain_run in runs:
       if 'laser' not in data_type:
         gain = gain_run.split(':')[0]
@@ -601,12 +701,14 @@ class Data(object):
         gain = ""
         logger.info("Process {1} run {0} ...".format(run, data_type))
 
-      cur = pfgutils.connection.oradbh.cursor()
+      cur = c._oradbh.cursor()
       res = cur.execute(
         "SELECT IOV_ID from MON_RUN_IOV where RUN_IOV_ID=(select IOV_ID from RUN_IOV where RUN_NUM=:1)",
         (run,)).fetchone()
       if res:
         iov = res[0]
+      elif True:
+        iov = None
       else:
         logger.error("IOV not found for run {0}".format(run))
         cur.close()
@@ -622,28 +724,48 @@ class Data(object):
         sql = "select LOGIC_ID, ADC_MEAN_{0}, ADC_RMS_{0} from MON_TEST_PULSE_DAT where IOV_ID=:1".format(gain)
         fields = [x + gain for x in ['ADC_MEAN_', 'ADC_RMS_']]
       elif "laser" in data_type:
-        # TODO: check keys in DB
+        ## TODO: check keys in DB
         sql = "select LOGIC_ID, APD_MEAN, APD_RMS, APD_OVER_PN_MEAN, APD_OVER_PN_RMS from {0} where IOV_ID=:1".format(lasertable)
         fields = ['APD_MEAN', 'APD_RMS', 'APD_OVER_PN_MEAN', 'APD_OVER_PN_RMS']
       else:
         logger.error("Unknown table: {0}".format(data_type))
         cur.close()
         return
+      if "laser" not in data_type or lasertable:
+        result = c._oradbh.cursor().execute(sql, (iov,))
+      else:
+        subprocess.run([
+            "python3", 
+            "laser-proc/main.py", 
+            "laser-proc/runlist.csv", 
+            "/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/"
+        ])
+        fields = ['APD_MEAN', 'APD_OVER_PN_MEAN', 'APD_RMS']
+        apd_mean = pd.read_csv(f"/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/LT_Amp_{run}.csv", header=0)
+        apd_over_pn_mean = pd.read_csv(f"/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/LT_AmpOverPN_{run}.csv", header=0)
+        apd_rms = pd.read_csv(f"/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/LT_RMS_{run}.csv", header=0)
+        result = merge(apd_mean, apd_over_pn_mean, apd_rms)
 
       cur.close()
       cur = self.dbh.cursor()
-      result = pfgutils.connection.oradbh.cursor().execute(sql, (iov,))
       cur.execute("INSERT INTO runs VALUES (%s, %s, %s, %s)", (self.ghc_id, run, data_type, gain))
+     
       counter = 0
+      value_rows = []
       for row in result:
         for k in range(len(fields)):
-          cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s"
-                      ", (SELECT keyid FROM valuekeys WHERE key=%(key)s), %(value)s)",
-                      {'ghc': self.ghc_id, 'dbid': row[0], 'key': fields[k], 'value': row[k + 1]})
-        counter += 1
-      logger.info("Exported {0} records".format(counter))
-      self.dbh.commit()
-
+        #cur.execute("INSERT INTO \"values\" VALUES (%(ghc)s, %(dbid)s (SELECT keyid FROM valuekeys WHERE key=%(key)s), %(value)s)", {'ghc': self.ghc_id, 'dbid': row[0], 'key': fields[k], 'value': row[k + 1]})
+          value_rows.append((self.ghc_id, row[0], self.valuekeysDict[fields[k]], row[k + 1]))      
+          counter += 1
+      if value_rows:
+        insert_query = """
+          INSERT INTO "values" (ghc, dbid, keyid, value)
+          VALUES %s
+        """
+        execute_values(cur, insert_query, value_rows)
+        logger.info("Exported {0} records".format(counter))
+        self.dbh.commit()
+    
   def readDataFromFile(self, datatype, files):
     """
       Read data from file called 'source'
@@ -692,10 +814,10 @@ class Data(object):
     print(" {0:^10s} | {2:^30s} | {1:^40s}".format("channel", "coordinates", "flags"), file=ostream)
     if output is None:
       print("-" * 80, file=ostream)
-
+    self.getFlagsForAllChannels() #MAYBE RELOCATE????
     for chid in self.getProblematicChannels():
       flags = self.getFlagsForChannel(chid)
-      # info = getChannelInfo(chid)
+      ## info = getChannelInfo(chid)
       if getSubDetector(chid) == 'EE':
         data = list(getXYZ(chid))
         data.extend([getDetSM(chid), getTT(chid)])
@@ -715,8 +837,12 @@ class Data(object):
     """
     ostream = output or sys.stdout
     print("|_. {0:^10s} |_\\2. {2:^30s} |_. {1:^40s} |".format("Channel ID", "Flags", "Info"), file=ostream)
+
+    self.getFlagsForAllChannels() #MAYBE RELOCATE????
+ 
     for chid in self.getProblematicChannels():
       flags = self.getFlagsForChannel(chid)
+      
       if getSubDetector(chid) == 'EE':
         data = list(getXYZ(chid))
         data.extend([getDetSM(chid), getTT(chid)])
@@ -725,7 +851,7 @@ class Data(object):
         data = list(getEtaPhi(chid))
         data.extend([getDetSM(chid), getTT(chid)])
         coord = "iEta={0:+2d} iPhi={1:3d} | {2:5s} TT{3:2d}".format(*data)
-
+        
       print("| {0:10d} | {2:30s} | {1:40s} |".format(chid, "+".join(flags), coord), file=ostream)
 
   # def getchnum(self, d, x):
@@ -809,8 +935,9 @@ def getChannelInfo(c):
     keys for EB: id, location, SM, TT, iEta, iPhi
     keys for EE: id, location, SM, Dee, iX, iY, iZ
   """
+  c = connection.Connection()
   info = {'id': c}
-  info.update(pfgutils.connection.getChDict(c))
+  info.update(c.getChDict(c))
   return info
 
 
@@ -825,36 +952,37 @@ def getTT(channel):
   """
     Returns TT number for channel
   """
-  return pfgutils.connection.getChDict(channel)['tower']
-
-
-def getCCU(channel):
-  return pfgutils.connection.getChDict(channel)['ccu']
+  c = connection.Connection()
+  return c.getChDict(channel)['ccu']
 
 
 def getXtal(channel):
   """
     Returns crystal number for channel
   """
-  return pfgutils.connection.getChDict(channel)['xtalinccu']
+  c = connection.Connection()
+  return c.getChDict(channel)['xtalinccu']
 
 
 def getDetSM(channel):
-  return pfgutils.connection.getChDict(channel)['det']
+  c = connection.Connection()
+  return c.getChDict(channel)['det']
 
 
 def getSM(channel):
   """
     Returns SM number for EB channel
   """
-  return pfgutils.connection.getChDict(channel)['det'][2:]
+  c = connection.Connection()
+  return c.getChDict(channel)['det'][2:]
 
 
 def getEtaPhi(channel):
   """
     Return (Eta, Phi) tuple for EB channels
   """
-  r = pfgutils.connection.getChDict(channel)
+  c = connection.Connection()
+  r = c.getChDict(channel)
   return r['ieta'], r['iphi']
 
 
@@ -862,7 +990,8 @@ def getEtaPhiBin(channel):
   """
     Return (Eta, Phi) tuple for EB channels
   """
-  r = pfgutils.connection.getChDict(channel)
+  c = connection.Connection()
+  r = c.getChDict(channel)
   return r['ieta'] + 86, r['iphi']
 
 
@@ -870,7 +999,8 @@ def getXYZ(channel):
   """
     Return (x, y , -1|1 ) tuple for EE channels
   """
-  r = pfgutils.connection.getChDict(channel)
+  c = connection.Connection()
+  r = c.getChDict(channel)
   return r['ix'], r['iy'], r['iz']
 
 
@@ -878,7 +1008,8 @@ def getSubDetector(channel):
   """
     Returns EB|EE detector place of channel
   """
-  return pfgutils.connection.getChDict(channel)['det'][:2]
+  c = connection.Connection()
+  return c.getChDict(channel)['det'][:2]
 
 
 def det_to_sql(det):
@@ -895,6 +1026,16 @@ def det_to_sql(det):
     return det
   return '2%' if det == 'EE' else ('1%' if det == 'EB' else '%')
 
+def merge(mean, over_pn_mean, rms):
+    df = pd.DataFrame({'dbid': [], 'mean': [], 'over_pn_mean': [], 'rms': []})
+    df['dbid'] = mean['label'].str.extract(r'(\d+)$')[0]
+    df['mean'] = mean['value'].values
+    df['over_pn_mean'] = over_pn_mean['value'].values
+    df['rms'] = rms['value'].values
+    
+    df['dbid'] = df['dbid'].astype(int)
+
+    return df.values
 
 def is_iterable(thing):
   return isinstance(thing, Iterable) and not isinstance(thing, str)

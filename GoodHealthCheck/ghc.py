@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 # coding=utf-8
-
-print("line0")
-
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
-
+import pandas as pd
 import argparse
 import codecs
 import copy
@@ -20,9 +17,9 @@ import textile2html
 from ghc_modules import Data
 from ghc_modules.Plot import Plotter
 from pfgutils import textile
-from pfgutils.Settings import max_good_status
-
-import pfgutils.connection
+from Settings import max_good_status
+from thresholds import CONFIG
+import connection
 
 startts = datetime.datetime.now()
 
@@ -35,7 +32,7 @@ parser.add_argument('-poff', help="Pedestal HV OFF runs numbers or list of files
 parser.add_argument('-tp', help="Test Pulse runs numbers or list of files", dest='tp_runs')
 parser.add_argument('-l', help="Laser runs or list of files", dest='l_runs')
 parser.add_argument('-lt', '--lasertable', help="Laser table to use in Oracle DB", dest='lasertable',
-                    default="MON_LASER_BLUE_DAT", metavar="TABLE")
+                    default="", metavar="TABLE")
 parser.add_argument('-o', '--output', help="Results directory (default: <ghc_id> or <ghc_id>_keep)", dest='output',
                     metavar="DIRECTORY")
 parser.add_argument('-r', '--redo', help="Redo existing GHC. Specify twice to re-classify channels.", dest='redo',
@@ -44,9 +41,9 @@ parser.add_argument('--csv', help="Create csv file with a list of problematic ch
                     action="store_true")
 parser.add_argument('-k', "--keep-flagged", help="Keep channels with channeldb flag > {0}".format(max_good_status),
                     dest="keep", action="store_true")
-parser.add_argument('-f', "--format", help="Image format", dest='imgformat', default="png", metavar="FORMAT")
+parser.add_argument('-f', "--format", help="Image formats (comma-separated list, e.g. 'png,root')", dest='imgformat', default="png,root", metavar="FORMAT")
 parser.add_argument('-q', "--quiet", help="Don't print summary table with problematic channels", action="store_false",
-                    dest='verbose')
+                   dest='verbose')
 parser.add_argument('-np', '--no-plots', help="Don't make plots", action="store_true", dest='noplots')
 # TODO: Remove me when done
 # parser.add_argument('--expert-mode', help=argparse.SUPPRESS, action="store_true", dest='expert')
@@ -55,8 +52,6 @@ parser.add_argument("--debug", help="Enable more verbose logging", action="store
 args = parser.parse_args()
 
 sys.argv = []
-
-print("here0")
 
 if args.output is None:
     args.output = args.ghc_id + ('_keep' if args.keep else '')
@@ -83,9 +78,8 @@ logger.addHandler(ch)
 
 logger.setLevel(args.loglevel)
 
-ext = args.imgformat
-
-print("here1")
+formats = [fmt.strip() for fmt in args.imgformat.split(',')]
+ext = formats[0]  # Use first format for image links in the report
 
 if not args.output:
     outputdir = "RESULTS"
@@ -95,10 +89,8 @@ if not os.path.exists(outputdir):
     os.mkdir(outputdir)
 
 log_textile = codecs.open(os.path.join(outputdir, 'index.textile'), 'w', encoding='UTF-8')
-print("here2")
 
 header_count = {1: 0, 2: 0, 3: 0}
-print("here3")
 
 def header(text, level=1, name=None):
     header_count[level] += 1
@@ -113,10 +105,11 @@ def header(text, level=1, name=None):
 
 
 logging.info("GoodHealthCheck %s start", args.ghc_id)
-print("here4")
-
 GHC = Data.Data(args.ghc_id, args.keep)
-if args.redo > 0 and not GHC.can_redo:
+
+if not GHC.can_redo and (args.redo is not None):
+    print(GHC.can_redo)
+    print(args.redo)
     logging.critical("No data found for GHC %s, aborting", args.ghc_id)
     exit(1)
 
@@ -133,18 +126,18 @@ if args.redo is None:
     if args.poff_runs is not None:
         logging.info("Pedestals with HV off...")
         GHC.readData(source, runs=args.poff_runs.split(), data_type="pedestal_hvoff")
-
     if args.tp_runs is not None:
         logging.info("Test pulse...")
         GHC.readData(source, runs=args.tp_runs.split(), data_type="testpulse")
     if args.l_runs is not None:
         logging.info("Laser...")
+        for run in args.l_runs.split():
+            laser_df = pd.DataFrame({'run': [int(run)], 'dataset': ['/Global/Online/ALL/']})
+        laser_df.to_csv('laser-proc/runlist.csv', index=False) 
         GHC.readData(source, runs=args.l_runs.split(), data_type="laser", lasertable=args.lasertable)
-
 if args.redo == 2:
     logging.warning("Channels will be reclassified")
     GHC.resetFlags()
-
 GHC.classifyChannels()
 
 logging.info("Creating report file")
@@ -153,8 +146,7 @@ print("", file=log_textile)
 
 if not args.keep:
     print("Channels with ecal channel status > {0} were removed. ".format(max_good_status), file=log_textile)
-    print("Click \"here\":../{0}_keep/report.html to view report with all channels in.".format(
-        args.ghc_id), file=log_textile)
+    print("Click \"here\":../{0}_keep/report.html to view report with all channels in.".format(args.ghc_id), file=log_textile)
     print("", file=log_textile)
 else:
     print("Channels with ecal channel status > {0} were kept. ".format(max_good_status), file=log_textile)
@@ -501,7 +493,6 @@ if args.verbose:
 
 # if args.verbose: or args.expert:
     print("p. \"Summary of all channels with flags\":flags.html\n", file=log_textile)
-
 if args.csv:
     logging.info("Creating CSV file")
     with open("ghc_{0}_r.csv".format(args.ghc_id), "w") as f:
@@ -516,134 +507,142 @@ if not args.noplots:
         if not os.path.exists(outputdir + "/" + subdir):
             os.mkdir(outputdir + "/" + subdir)
 
-    for plottype in ('mean', 'RMS'):
+    for plottype in ('MEAN', 'RMS'):
         for g in ("G1", "G6", "G12"):
             for d in ("EB", "EE"):
                 ### 1D plots
                 h = plotter.get1DHistogram(key=("PED_ON_{0}_{1}".format(plottype, g)).upper(), det=d,
                                            name="Pedestal {0}, gain {1} ({2})".format(plottype, g, "HV ON"))
-                plotter.saveHistogram(h, outputdir + "/pedestals_hvon/{0}_{1}_{2}.1D.{3}".format(g, plottype.upper(),
-                                                                                                 d, ext))
+                plotter.saveHistogram(h, outputdir + "/pedestals_hvon/{0}_{1}_{2}.1D".format(g, plottype.upper(),
+                                                                                                 d), formats)
 
                 h = plotter.get1DHistogram(key=("PED_OFF_{0}_{1}".format(plottype, g)).upper(), det=d,
                                            name="Pedestal {0}, gain {1} ({2})".format(plottype, g, "HV OFF"))
-                plotter.saveHistogram(h, outputdir + "/pedestals_hvoff/{0}_{1}_{2}.1D.{3}".format(g, plottype.upper(),
-                                                                                                  d, ext))
+                plotter.saveHistogram(h, outputdir + "/pedestals_hvoff/{0}_{1}_{2}.1D".format(g, plottype.upper(),
+                                                                                                  d), formats)
 
                 h = plotter.get1DHistogram(key=("ADC_{0}_{1}".format(plottype, g)).upper(), det=d,
                                            name="Test Pulse {0}, gain {1}".format(plottype, g))
-                plotter.saveHistogram(h,
-                                      outputdir + "/testpulse/{0}_{1}_{2}.1D.{3}".format(g, plottype.upper(), d, ext))
+                plotter.saveHistogram(h, outputdir + "/testpulse/{0}_{1}_{2}.1D".format(g, plottype.upper(), d), formats)
 
             ### 2D plots
             h = plotter.get2DHistogram(key=("PED_ON_{0}_{1}".format(plottype, g)).upper(),
                                        name="Pedestal {0}, gain {1} ({2})".format(plottype, g, "HV ON"))
-            plotter.saveHistogram(h, outputdir + "/pedestals_hvon/{0}_{1}.2D.{2}".format(g, plottype.upper(), ext))
+            plotter.saveHistogram(h, outputdir + "/pedestals_hvon/{0}_{1}.2D".format(g, plottype.upper()), formats)
 
             h = plotter.get2DHistogram(key=("PED_OFF_{0}_{1}".format(plottype, g)).upper(),
                                        name="Pedestal {0}, gain {1} ({2})".format(plottype, g, "HV OFF"))
-            plotter.saveHistogram(h, outputdir + "/pedestals_hvoff/{0}_{1}.2D.{2}".format(g, plottype.upper(), ext))
+            plotter.saveHistogram(h, outputdir + "/pedestals_hvoff/{0}_{1}.2D".format(g, plottype.upper()), formats)
 
             h = plotter.get2DHistogram(key="ADC_{0}_{1}".format(plottype.upper(), g),
                                        name="Test Pulse {0}, gain {1}".format(plottype, g))
-            plotter.saveHistogram(h, outputdir + "/testpulse/{0}_{1}.2D.{2}".format(g, plottype.upper(), ext))
+            plotter.saveHistogram(h, outputdir + "/testpulse/{0}_{1}.2D".format(g, plottype.upper()), formats)
 
         for d in ("EB", "EE"):
             ### laser plots
             h = plotter.get1DHistogram(key=("APD_{0}".format(plottype)).upper(), det=d,
                                        name="Laser {0} ({1})".format(plottype, args.lasertable))
-            plotter.saveHistogram(h, outputdir + "/laser/Laser_{0}_{1}.1D.{2}".format(plottype.upper(), d, ext))
+            plotter.saveHistogram(h, outputdir + "/laser/LASER_{0}_{1}.1D".format(plottype.upper(), d), formats)
 
             h = plotter.get1DHistogram(key="APD_OVER_PN_{0}".format(plottype), det=d,
                                        name="APD/PN {0} ({1})".format(plottype, args.lasertable))
-            plotter.saveHistogram(h, outputdir + "/laser/APDPN_{0}_{1}.1D.{2}".format(plottype.upper(), d, ext))
+            plotter.saveHistogram(h, outputdir + "/laser/APDPN_{0}_{1}.1D".format(plottype.upper(), d), formats)
 
         ### 2D laser plots
         h = plotter.get2DHistogram(key="APD_{0}".format(plottype.upper()),
                                    name="Laser {0} ({1})".format(plottype, args.lasertable))
-        plotter.saveHistogram(h, outputdir + "/laser/Laser_{0}.2D.{1}".format(plottype.upper(), ext))
+        plotter.saveHistogram(h, outputdir + "/laser/Laser_{0}.2D".format(plottype.upper()), formats)
 
         h = plotter.get2DHistogram(key="APD_OVER_PN_{0}".format(plottype.upper()),
                                    name="APD/PN {0} ({1})".format(plottype, args.lasertable))
-        plotter.saveHistogram(h, outputdir + "/laser/APDPN_{0}.2D.{1}".format(plottype.upper(), ext))
+        plotter.saveHistogram(h, outputdir + "/laser/APDPN_{0}.2D".format(plottype.upper()), formats)
+    logging.info("Creating Root links page")
+    log_root_files = open(os.path.join(outputdir, 'root.textile'), 'w')
+    plotter.printRootLinks(outputdir, log_root_files)
+    log_root_files.close()
+    logging.info("Converting Root links page")
+    textile2html.convert(os.path.join(outputdir, 'root.textile'))
+
+    print("p. \"Root files of all plots\":root.html\n", file=log_textile)
 
 # description of error types
 print(header("Description of errors"), file=log_textile)
 
-print("""h2. Description of errors for EB
+print(f"""h2. Description of errors for EB
 
 Dead pedestal  (DP)
 
-* Gain 1 : MEAN <= 1 or RMS <= 0.2
-* Gain 6 : MEAN <= 1 or RMS <= 0.4
-* Gain 12: MEAN <= 1 or RMS <= 0.5
+* Gain 1 : MEAN <= {CONFIG['EB']['DP']['G1'][0]} or RMS <= {CONFIG['EB']['DP']['G1'][1]}
+* Gain 6 : MEAN <= {CONFIG['EB']['DP']['G6'][0]} or RMS <= {CONFIG['EB']['DP']['G6'][1]}
+* Gain 12: MEAN <= {CONFIG['EB']['DP']['G12'][0]} or RMS <= {CONFIG['EB']['DP']['G12'][1]}
 
  Bad pedestal   (BP)
 
-* abs(MEAN - 200) >= 30 and MEAN > 1
+* abs(MEAN - {CONFIG['EB']['BP'][0]}) >= {CONFIG['EB']['BP'][1]} and MEAN > {CONFIG['EB']['BP'][2]}
 
  Large RMS      (LR)
 
-* Gain 1 : (not (MEAN <= 1 or RMS <= 0.2)) and (RMS >= 1.1 and RMS < 3 and MEAN > 1)
-* Gain 6 : (not (MEAN <= 1 or RMS <= 0.4)) and (RMS >= 1.3 and RMS < 4 and MEAN > 1)
-* Gain 12: (not (MEAN <= 1 or RMS <= 0.5)) and (RMS >= 2.1 and RMS < 6 and MEAN > 1)
+* Gain 1 : (not DP) and (RMS >= {CONFIG['EB']['LR']['G1'][0]} and RMS < {CONFIG['EB']['LR']['G1'][1]} and MEAN > {CONFIG['EB']['LR']['G1'][2]})
+* Gain 6 : (not DP) and (RMS >= {CONFIG['EB']['LR']['G6'][0]} and RMS < {CONFIG['EB']['LR']['G6'][1]} and MEAN > {CONFIG['EB']['LR']['G6'][2]})
+* Gain 12: (not DP) and (RMS >= {CONFIG['EB']['LR']['G6'][0]} and RMS < {CONFIG['EB']['LR']['G12'][1]} and MEAN > {CONFIG['EB']['LR']['G12'][2]})
 
  Very Large RMS (VLR)
 
-* Gain 1 : (not (MEAN <= 1 or RMS <= 0.2)) and (RMS > 3 and MEAN > 1)
-* Gain 6 : (not (MEAN <= 1 or RMS <= 0.4)) and (RMS > 4 and MEAN > 1)
-* Gain 12: (not (MEAN <= 1 or RMS <= 0.5)) and (RMS > 6 and MEAN > 1)
+* Gain 1 : (not DP) and (RMS >= {CONFIG['EB']['VLR']['G1'][0]} and MEAN > {CONFIG['EB']['VLR']['G1'][1]})
+* Gain 6 : (not DP) and (RMS >= {CONFIG['EB']['VLR']['G6'][0]} and MEAN > {CONFIG['EB']['VLR']['G6'][1]})
+* Gain 12: (not DP) and (RMS >= {CONFIG['EB']['VLR']['G6'][0]} and MEAN > {CONFIG['EB']['VLR']['G12'][1]})
 
 h2. Description of errors for EE
+Dead pedestal  (DP)
 
- Dead pedestal  (DP)
-
-* Gain 1 : MEAN <= 1 or RMS <= 0.2
-* Gain 6 : MEAN <= 1 or RMS <= 0.4
-* Gain 12: MEAN <= 1 or RMS <= 0.5
+* Gain 1 : MEAN <= {CONFIG['EE']['DP']['G1'][0]} or RMS <= {CONFIG['EE']['DP']['G1'][1]}
+* Gain 6 : MEAN <= {CONFIG['EE']['DP']['G6'][0]} or RMS <= {CONFIG['EE']['DP']['G6'][1]}
+* Gain 12: MEAN <= {CONFIG['EE']['DP']['G12'][0]} or RMS <= {CONFIG['EE']['DP']['G12'][1]}
 
  Bad pedestal   (BP)
 
-* abs(MEAN - 200) >= 30 and MEAN > 1
+* abs(MEAN - {CONFIG['EE']['BP'][0]}) >= {CONFIG['EE']['BP'][1]} and MEAN > {CONFIG['EE']['BP'][2]}
 
  Large RMS      (LR)
 
-* Gain 1 : (not (MEAN <= 1 or RMS <= 0.2)) and (RMS >= 1.5 and RMS < 4 and MEAN > 1)
-* Gain 6 : (not (MEAN <= 1 or RMS <= 0.4)) and (RMS >= 2.0 and RMS < 5 and MEAN > 1)
-* Gain 12: (not (MEAN <= 1 or RMS <= 0.5)) and (RMS >= 3.2 and RMS < 7 and MEAN > 1)
+* Gain 1 : (not DP) and (RMS >= {CONFIG['EE']['LR']['G1'][0]} and RMS < {CONFIG['EE']['LR']['G1'][1]} and MEAN > {CONFIG['EE']['LR']['G1'][2]})
+* Gain 6 : (not DP) and (RMS >= {CONFIG['EE']['LR']['G6'][0]} and RMS < {CONFIG['EE']['LR']['G6'][1]} and MEAN > {CONFIG['EE']['LR']['G6'][2]})
+* Gain 12: (not DP) and (RMS >= {CONFIG['EE']['LR']['G6'][0]} and RMS < {CONFIG['EE']['LR']['G12'][1]} and MEAN > {CONFIG['EE']['LR']['G12'][2]})
 
  Very Large RMS (VLR)
 
-* Gain 1 : (not (MEAN <= 1 or RMS <= 0.2)) and (RMS > 4 and MEAN > 1)
-* Gain 6 : (not (MEAN <= 1 or RMS <= 0.4)) and (RMS > 5 and MEAN > 1)
-* Gain 12: (not (MEAN <= 1 or RMS <= 0.5)) and (RMS > 7 and MEAN > 1)
+* Gain 1 : (not DP) and (RMS >= {CONFIG['EE']['VLR']['G1'][0]} and MEAN > {CONFIG['EE']['VLR']['G1'][1]})
+* Gain 6 : (not DP) and (RMS >= {CONFIG['EE']['VLR']['G6'][0]} and MEAN > {CONFIG['EE']['VLR']['G6'][1]})
+* Gain 12: (not DP) and (RMS >= {CONFIG['EE']['VLR']['G6'][0]} and MEAN > {CONFIG['EE']['VLR']['G12'][1]})
 
 h2. Description of HV OFF errors:
 
  Bad Voltage for G12 (BV)
 
-* abs(RMS&#40;HVON) - RMS&#40;HVOFF)) < 0.2 and 170 <= MEAN&#40;HVON) <= 230
+* abs(RMS&#40;HVON) - RMS&#40;HVOFF)) < {CONFIG['EB']['BV'][0]} and {CONFIG['EB']['BV'][1]} <= MEAN&#40;HVON) <= {CONFIG['EB']['BV'][2]}
 
 h2. Description of Test Pulse errors
 
  Dead TestPulse          (DTP)
 
-* MEAN = 0
+* MEAN = {CONFIG['EB']['DTP'][0]}
 
  Low TestPulse amplitude (STP)
 
 * AVG = average mean for each subdetector (EB, EE)
-* MEAN > 0 and MEAN < 0.5 * AVG
+* MEAN > {CONFIG['EB']['STP'][0]} and MEAN < {CONFIG['EB']['STP'][1]} * AVG
 
  Large TP amplitude      (LTP)
 
-* MEAN > 1.5 * AVG
+* MEAN > {CONFIG['EB']['LTP'][0]} * AVG
 
 h2. Description of Laser Pulse errors:
 
-* DLAMPL: MEAN <= 0
-* SLAMPL: MEAN > 0 and MEAN < AVG * 0.1         # AVG per subdetector
-* LLERRO: MEAN > AVG * 0.1 and RMS / MEAN > 0.1 # AVG per subdetector
+* DLAMPL: MEAN <= {CONFIG['EB']['DLAMPL'][0]}
+* SLAMPL: MEAN > {CONFIG['EB']['SLAMPL'][0]} and MEAN < AVG * {CONFIG['EB']['SLAMPL'][1]}         # AVG per subdetector
+* LLERRO: MEAN > AVG * {CONFIG['EB']['LLERRO'][0]} and RMS / MEAN > {CONFIG['EB']['LLERRO'][1]} # AVG per subdetector
+* DLAMPL_OVERPN: MEAN_OVER_PN <= {CONFIG['EB']['DLAMPL_OVERPN'][0]}
+* SLAMPL_OVERPN: MEAN_OVER_PN > {CONFIG['EB']['SLAMPL_OVERPN'][0]} and MEAN_OVER_PN < AVG * {CONFIG['EB']['SLAMPL_OVERPN'][1]}         # AVG per subdetector
 """, file=log_textile)
 
 endts = datetime.datetime.now()

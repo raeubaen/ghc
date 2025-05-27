@@ -3,7 +3,7 @@
 import os
 import sqlite3
 import logging
-from . import Settings
+import Settings
 from pfgutils.dqm.DQMURLProvider import DQMURLProvider
 import pickle
 import pandas as pd
@@ -11,7 +11,7 @@ import pandas as pd
 dqms = {'online': DQMURLProvider("online"), "offline": DQMURLProvider("offline")}
 
 ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
-pickle_file = '/afs/cern.ch/user/c/charlesf/ghc/pfgutils/pfgutils/ch_dict.pkl'
+pickle_file = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ch_dict.pkl'
 
 try:
   import cx_Oracle

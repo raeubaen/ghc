@@ -1,0 +1,16 @@
+# Generated output directories
+*_keep/
+*_keep.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# AFS temporary files
+.__afs*
+
+# Generated data
+*.csv
+*.root
+*.png 
