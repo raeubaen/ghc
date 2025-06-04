@@ -25,30 +25,23 @@ startts = datetime.datetime.now()
 
 parser = argparse.ArgumentParser()
 parser.add_argument('ghc_id', help="ID of this GHC", metavar="ghc")
-parser.add_argument('-c', '--dbstr', choices=['oracle', 'files'], help="Data source (oracle|files)",
-                    dest='dbstr', default="oracle")
+parser.add_argument('-c', '--dbstr', choices=['oracle', 'files'], help="Data source (oracle|files)", dest='dbstr', default="oracle")
 parser.add_argument('-pon', help="Pedestal HV ON  runs numbers or list of files", dest='pon_runs')
 parser.add_argument('-poff', help="Pedestal HV OFF runs numbers or list of files", dest='poff_runs')
 parser.add_argument('-tp', help="Test Pulse runs numbers or list of files", dest='tp_runs')
 parser.add_argument('-l', help="Laser runs or list of files", dest='l_runs')
-parser.add_argument('-lt', '--lasertable', help="Laser table to use in Oracle DB", dest='lasertable',
-                    default="", metavar="TABLE")
-parser.add_argument('-o', '--output', help="Results directory (default: <ghc_id> or <ghc_id>_keep)", dest='output',
-                    metavar="DIRECTORY")
-parser.add_argument('-r', '--redo', help="Redo existing GHC. Specify twice to re-classify channels.", dest='redo',
-                    action='count')
-parser.add_argument('--csv', help="Create csv file with a list of problematic channels", dest='csv',
-                    action="store_true")
-parser.add_argument('-k', "--keep-flagged", help="Keep channels with channeldb flag > {0}".format(max_good_status),
-                    dest="keep", action="store_true")
+#parser.add_argument('-lt', '--lasertable', help="Laser table to use in Oracle DB", dest='lasertable',
+#                    default="", metavar="TABLE")
+parser.add_argument('-o', '--output', help="Results directory (default: <ghc_id> or <ghc_id>_keep)", dest='output', metavar="DIRECTORY")
+parser.add_argument('-r', '--redo', help="Redo existing GHC. Specify twice to re-classify channels.", dest='redo', action='count')
+parser.add_argument('--csv', help="Create csv file with a list of problematic channels", dest='csv', action="store_true")
+parser.add_argument('-k', "--keep-flagged", help="Keep channels with channeldb flag > {0}".format(max_good_status), dest="keep", action="store_true")
 parser.add_argument('-f', "--format", help="Image formats (comma-separated list, e.g. 'png,root')", dest='imgformat', default="png,root", metavar="FORMAT")
-parser.add_argument('-q', "--quiet", help="Don't print summary table with problematic channels", action="store_false",
-                   dest='verbose')
+parser.add_argument('-q', "--quiet", help="Don't print summary table with problematic channels", action="store_false", dest='verbose')
 parser.add_argument('-np', '--no-plots', help="Don't make plots", action="store_true", dest='noplots')
 # TODO: Remove me when done
 # parser.add_argument('--expert-mode', help=argparse.SUPPRESS, action="store_true", dest='expert')
-parser.add_argument("--debug", help="Enable more verbose logging", action="store_const", const=logging.DEBUG,
-                    default=logging.INFO, dest="loglevel")
+parser.add_argument("--debug", help="Enable more verbose logging", action="store_const", const=logging.DEBUG, default=logging.INFO, dest="loglevel")
 args = parser.parse_args()
 
 sys.argv = []
@@ -134,7 +127,7 @@ if args.redo is None:
         for run in args.l_runs.split():
             laser_df = pd.DataFrame({'run': [int(run)], 'dataset': ['/Global/Online/ALL/']})
         laser_df.to_csv('laser-proc/runlist.csv', index=False) 
-        GHC.readData(source, runs=args.l_runs.split(), data_type="laser", lasertable=args.lasertable)
+        GHC.readData(source, runs=args.l_runs.split(), data_type="laser", lasertable='') #args.lasertable
 if args.redo == 2:
     logging.warning("Channels will be reclassified")
     GHC.resetFlags()
@@ -213,9 +206,7 @@ if GHC.has_ped_hvon:
             print("| {0:43s} | {1:5d} | {2:23s} |".format("Dead pedestal channels",
                                                                           GHC.getNumChannelsWithFlag("DP" + k, det=d),
                                                                           "DP" + k), file=log_textile)
-            print("| {0:43s} | {1:5d} | {2:23s} |".format("Pedestal mean outside [170,230]",
-                                                                          GHC.getNumChannelsWithFlag("BP" + k, det=d),
-                                                                          "BP" + k), file=log_textile)
+            print("| {0:43s} | {1:5d} | {2:23s} |".format(f"Pedestal mean outside [{CONFIG[d]['BV'][1]},{CONFIG[d]['BV'][2]}]", GHC.getNumChannelsWithFlag("BP" + k, det=d), "BP" + k), file=log_textile)
             print("| {0:43s} | {1:5d} | {2:23s} |".format("Large RMS (noisy channels)",
                                                                           GHC.getNumChannelsWithFlag("LR" + k, det=d),
                                                                           "LR" + k), file=log_textile)
@@ -541,20 +532,23 @@ if not args.noplots:
         for d in ("EB", "EE"):
             ### laser plots
             h = plotter.get1DHistogram(key=("APD_{0}".format(plottype)).upper(), det=d,
-                                       name="Laser {0} ({1})".format(plottype, args.lasertable))
+                                       name="Laser {0} ({1})".format(plottype, '')) #args.lasertable
             plotter.saveHistogram(h, outputdir + "/laser/LASER_{0}_{1}.1D".format(plottype.upper(), d), formats)
 
             h = plotter.get1DHistogram(key="APD_OVER_PN_{0}".format(plottype), det=d,
-                                       name="APD/PN {0} ({1})".format(plottype, args.lasertable))
+                                       name="APD/PN {0} ({1})".format(plottype, '')) #args.lasertable
+
             plotter.saveHistogram(h, outputdir + "/laser/APDPN_{0}_{1}.1D".format(plottype.upper(), d), formats)
 
         ### 2D laser plots
         h = plotter.get2DHistogram(key="APD_{0}".format(plottype.upper()),
-                                   name="Laser {0} ({1})".format(plottype, args.lasertable))
+                                   name="Laser {0} ({1})".format(plottype, '')) #args.lasertable
+
         plotter.saveHistogram(h, outputdir + "/laser/Laser_{0}.2D".format(plottype.upper()), formats)
 
         h = plotter.get2DHistogram(key="APD_OVER_PN_{0}".format(plottype.upper()),
-                                   name="APD/PN {0} ({1})".format(plottype, args.lasertable))
+                                   name="APD/PN {0} ({1})".format(plottype, '')) #args.lasertable
+
         plotter.saveHistogram(h, outputdir + "/laser/APDPN_{0}.2D".format(plottype.upper()), formats)
     logging.info("Creating Root links page")
     log_root_files = open(os.path.join(outputdir, 'root.textile'), 'w')
@@ -593,6 +587,7 @@ Dead pedestal  (DP)
 * Gain 12: (not DP) and (RMS >= {CONFIG['EB']['VLR']['G6'][0]} and MEAN > {CONFIG['EB']['VLR']['G12'][1]})
 
 h2. Description of errors for EE
+
 Dead pedestal  (DP)
 
 * Gain 1 : MEAN <= {CONFIG['EE']['DP']['G1'][0]} or RMS <= {CONFIG['EE']['DP']['G1'][1]}
@@ -619,11 +614,19 @@ h2. Description of HV OFF errors:
 
  Bad Voltage for G12 (BV)
 
+-----------EB------------
+
 * abs(RMS&#40;HVON) - RMS&#40;HVOFF)) < {CONFIG['EB']['BV'][0]} and {CONFIG['EB']['BV'][1]} <= MEAN&#40;HVON) <= {CONFIG['EB']['BV'][2]}
+
+-----------EE------------
+
+* abs(RMS&#40;HVON) - RMS&#40;HVOFF)) < {CONFIG['EE']['BV'][0]} and {CONFIG['EE']['BV'][1]} <= MEAN&#40;HVON) <= {CONFIG['EE']['BV'][2]}
 
 h2. Description of Test Pulse errors
 
- Dead TestPulse          (DTP)
+-----------EB------------
+
+Dead TestPulse          (DTP)
 
 * MEAN = {CONFIG['EB']['DTP'][0]}
 
@@ -636,13 +639,38 @@ h2. Description of Test Pulse errors
 
 * MEAN > {CONFIG['EB']['LTP'][0]} * AVG
 
+-----------EE------------
+
+ Dead TestPulse          (DTP)
+
+* MEAN = {CONFIG['EE']['DTP'][0]}
+
+ Low TestPulse amplitude (STP)
+
+* AVG = average mean for each subdetector (EB, EE)
+* MEAN > {CONFIG['EE']['STP'][0]} and MEAN < {CONFIG['EE']['STP'][1]} * AVG
+
+ Large TP amplitude      (LTP)
+
+* MEAN > {CONFIG['EE']['LTP'][0]} * AVG
+
 h2. Description of Laser Pulse errors:
+
+-----------EB------------
 
 * DLAMPL: MEAN <= {CONFIG['EB']['DLAMPL'][0]}
 * SLAMPL: MEAN > {CONFIG['EB']['SLAMPL'][0]} and MEAN < AVG * {CONFIG['EB']['SLAMPL'][1]}         # AVG per subdetector
 * LLERRO: MEAN > AVG * {CONFIG['EB']['LLERRO'][0]} and RMS / MEAN > {CONFIG['EB']['LLERRO'][1]} # AVG per subdetector
 * DLAMPL_OVERPN: MEAN_OVER_PN <= {CONFIG['EB']['DLAMPL_OVERPN'][0]}
 * SLAMPL_OVERPN: MEAN_OVER_PN > {CONFIG['EB']['SLAMPL_OVERPN'][0]} and MEAN_OVER_PN < AVG * {CONFIG['EB']['SLAMPL_OVERPN'][1]}         # AVG per subdetector
+
+-----------EE------------
+
+* DLAMPL: MEAN <= {CONFIG['EE']['DLAMPL'][0]}
+* SLAMPL: MEAN > {CONFIG['EE']['SLAMPL'][0]} and MEAN < AVG * {CONFIG['EE']['SLAMPL'][1]}         # AVG per subdetector
+* LLERRO: MEAN > AVG * {CONFIG['EE']['LLERRO'][0]} and RMS / MEAN > {CONFIG['EE']['LLERRO'][1]} # AVG per subdetector
+* DLAMPL_OVERPN: MEAN_OVER_PN <= {CONFIG['EE']['DLAMPL_OVERPN'][0]}
+* SLAMPL_OVERPN: MEAN_OVER_PN > {CONFIG['EE']['SLAMPL_OVERPN'][0]} and MEAN_OVER_PN < AVG * {CONFIG['EE']['SLAMPL_OVERPN'][1]}         # AVG per subdetector
 """, file=log_textile)
 
 endts = datetime.datetime.now()

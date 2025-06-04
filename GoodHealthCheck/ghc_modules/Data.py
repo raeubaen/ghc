@@ -335,7 +335,8 @@ class Data(object):
 
       return result
 
-  def PedestalComparison(self, channel, gain, det):
+  def PedestalComparison(self, channel, gain):
+    det = getSubDetector(channel) 
     tmpflags = []
     mean = self.getChannelData(channel, key='PED_ON_MEAN_' + gain)
     rms = self.getChannelData(channel, key='PED_ON_RMS_' + gain)
@@ -359,8 +360,7 @@ class Data(object):
     flags = [
       flag
       for gain in ['G1', 'G6', 'G12']
-      for det  in ['EB', 'EE']
-      for flag in self.PedestalComparison(channel, gain, det)
+      for flag in self.PedestalComparison(channel, gain)
     ]
     return list(set(flags))
   

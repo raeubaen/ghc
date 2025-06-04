@@ -12,7 +12,7 @@ CONFIG = {
     },
     
     # abs(MEAN - {0}) >= {1} and MEAN > {2}
-    "BP": [200, 30, 1],
+    "BP": [220, 50, 1],
 
     # (not (DP) and (RMS >= {0} and RMS < {1} and MEAN > {2})
     "LR": {
@@ -28,7 +28,7 @@ CONFIG = {
       "G12": [10, 1]
     },
     # abs(RMS&#40;HVON) - RMS&#40;HVOFF)) < {0} and {1} <= MEAN&#40;HVON) <= {2}
-    "BV": [0.2, 170, 230],
+    "BV": [0.2, 170, 270],
 
     # MEAN = {0}
     "DTP": [0],
@@ -68,7 +68,7 @@ CONFIG = {
     },
 
     # abs(MEAN - {0}) >= {1} and MEAN > {2}
-    "BP": [200, 30, 1],
+    "BP": [260, 90, 1],
 
     # (not (DP) and (RMS >= {0} and RMS < {1} and MEAN > {2})
     "LR": {
@@ -85,7 +85,7 @@ CONFIG = {
     },
 
     # abs(RMS&#40;HVON) - RMS&#40;HVOFF)) < {0} and {1} <= MEAN&#40;HVON) <= {2}
-    "BV": [0.2, 170, 230],
+    "BV": [0.2, 170, 350],
 
     # MEAN = {0}
     "DTP": [0],
@@ -101,16 +101,16 @@ CONFIG = {
     "DLAMPL": [5],
  
     # MEAN > {0} and MEAN < AVG * {1}         # AVG per subdetector 
-    "SLAMPL": [0, 0.1],
+    "SLAMPL": [0, 0.005],
 
     # LLERRO: MEAN > AVG * {0} and RMS / MEAN > {1} # AVG per subdetector
     "LLERRO": [0.1, 0.1],
 
     # DLAMPL_OVERPN: MEAN_OVER_PN <= {0}
-    "DLAMPL_OVERPN": [0.2],
+    "DLAMPL_OVERPN": [0.001],
 
-    # SLAMPL_OVERPN: MEAN_OVER_PN > {0} and MEAN_OVER_PN < AVG * {1}         # AVG per subd    etector
-    "SLAMPL_OVERPN": [0, 0.1]
+    # SLAMPL_OVERPN: MEAN_OVER_PN > {0} and MEAN_OVER_PN < AVG * {1}         # AVG per subdetector
+    "SLAMPL_OVERPN": [0, 0.0005]
   }
 }
 
