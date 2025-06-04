@@ -84,10 +84,10 @@ How to use
 
     source setup.sh
 
-**Example of analyse GHC28**
+**Example of analyse GHC1**
     
     source setup.sh
     python ghc.py -h
     python ghc.py --csv -o "results" -pon "392414" -poff "390112" -tp "392424" -l "392430" 1 |& tee ghc.log
-
+    python clear_ghc_data.py -s 1 -e 1
 You should see various output about channels.
