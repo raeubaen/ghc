@@ -151,18 +151,20 @@ print("", file=log_textile)
 print("|_. Run type |_. Gain 1 |_. Gain 6 |_. Gain 12 |", file=log_textile)
 runs = GHC.get_runs()
 
-for run_type in ('pedestal_hvon', 'pedestal_hvoff', 'testpulse'):
+for run_type in ('pedestal_hvon', 'pedestal_hvoff', 'testpulse', 'laser'):
     print("|", {'pedestal_hvon': "Pedestals, HV on",
-                                'pedestal_hvoff': "Pedestals, HV off", 'testpulse': "Test pulse"}[run_type], "|", end=' ', file=log_textile)
+        'pedestal_hvoff': "Pedestals, HV off", 'testpulse': "Test pulse", 'laser': "Laser"}[run_type], "|", end=' ', file=log_textile)
     for gain in ('G1', 'G6', 'G12'):
         try:
-            run = runs[run_type][gain]
+            if run_type != 'laser': 
+                run = runs[run_type][gain]
+            else:
+                run = runs[run_type]['']
         except KeyError:
             run = "-"
-
         print(run, "|", end=' ', file=log_textile)
-
     print("", file=log_textile)
+
 
 
 def mkImgLink(url):
@@ -485,9 +487,9 @@ if args.verbose:
 # if args.verbose: or args.expert:
     print("p. \"Summary of all channels with flags\":flags.html\n", file=log_textile)
 if args.csv:
-    logging.info("Creating CSV file")
-    with open("ghc_{0}_r.csv".format(args.ghc_id), "w") as f:
-        GHC.printProblematicChannelsCSV(f)
+    logging.info("Creating CSV files")
+    GHC.makeProblematicChannelsCSV(False, f"{outputdir}/ghc_{args.ghc_id}_bad_channels.csv")
+    GHC.makeProblematicChannelsCSV(True, f"{outputdir}/ghc_{args.ghc_id}_all_channels.csv")
 
 if not args.noplots:
     # plotting

@@ -63,7 +63,7 @@ class Data(object):
     self.channel_data_cache = {}
     self.channel_flag_cache = {}
     self.updateEcalChannelFlags()
-    self.valuekeysDict = self.valuekeysDict()
+    self.valuekeysDict = self.makeValuekeysDict()
 
   def updateEcalChannelFlags(self):
 ##
@@ -83,7 +83,7 @@ class Data(object):
 ##
     self.masked_channels = () #tuple(c[0] for c in curst)
 
-  def valuekeysDict(self, reverse=False):
+  def makeValuekeysDict(self, reverse=False):
     """
       Return valuekeys dictionary
     """
@@ -103,12 +103,12 @@ class Data(object):
     """
       Return list of all channels
     """
-    channels = df[17].astype(str)
+    channels = df['dbid'].astype(str)
     
     if len(det) == 2:
-        det_column = df[26].astype(str).str[:2]
+        det_column = df['det'].astype(str).str[:2]
     else:
-        det_column = df[26].astype(str)
+        det_column = df['det'].astype(str)
 
     if det != 'ALL':
         channels = channels[det_column == det]
@@ -265,7 +265,7 @@ class Data(object):
       Reset flags in DB
     """
     self.cur.execute("DELETE FROM flags WHERE ghc=%s", (self.ghc_id,))
-    self.cur.execute("DELETE FROM missed_channels WHERE ghc=%s", (self.ghc_id,))
+    self.cur.execute("DELETE FROM missed_channels", (self.ghc_id,))
     self.isClassified = False
     self.dbh.commit()
   
@@ -293,10 +293,34 @@ class Data(object):
     """
     Optimized version of getChannelDataOld using cache
     """
+    if isinstance(key, int):
+        valueKeysRev = self.makeValuekeysDict(reverse=True)
+        key = valueKeysRev[str(key)]
     if channel in self.channel_data_cache:
         return self.channel_data_cache[channel].get(key, None)
     return None
+
+  def getHvonMeanData(self, channel):
+    return (self.getChannelData(channel, key=1010), self.getChannelData(channel, key=1020), self.getChannelData(channel, key=1030))
+
+  def getHvonRmsData(self, channel): 
+    return (self.getChannelData(channel, key=1011), self.getChannelData(channel, key=1021), self.getChannelData(channel, key=1031))
+
+  def getHvoffMeanData(self, channel): 
+    return (self.getChannelData(channel, key=1110), self.getChannelData(channel, key=1120), self.getChannelData(channel, key=1130))
   
+  def getHvoffRmsData(self, channel): 
+    return (self.getChannelData(channel, key=1111), self.getChannelData(channel, key=1121), self.getChannelData(channel, key=1131))
+  
+  def getTestPulseMeanData(self, channel): 
+    return (self.getChannelData(channel, key=2010), self.getChannelData(channel, key=2020), self.getChannelData(channel, key=2030))
+  
+  def getTestPulseRmsData(self, channel): 
+    return (self.getChannelData(channel, key=2011), self.getChannelData(channel, key=2021), self.getChannelData(channel, key=2031))
+  
+  def getLaserData(self, channel): 
+    return (self.getChannelData(channel, key=3000), self.getChannelData(channel, key=3001), self.getChannelData(channel, key=3010))
+    
   def getChannelDataOld(self, channel, key=None):
     """
       Returns channel's value for channels
@@ -814,7 +838,7 @@ class Data(object):
     print(" {0:^10s} | {2:^30s} | {1:^40s}".format("channel", "coordinates", "flags"), file=ostream)
     if output is None:
       print("-" * 80, file=ostream)
-    self.getFlagsForAllChannels() #MAYBE RELOCATE????
+    self.getFlagsForAllChannels() 
     for chid in self.getProblematicChannels():
       flags = self.getFlagsForChannel(chid)
       ## info = getChannelInfo(chid)
@@ -830,6 +854,99 @@ class Data(object):
       print(" {0:10d} | {2:30s} | {1:40s} ".format(chid, "+".join(flags), coord), file=ostream)
     if output is None:
       print("-" * 80, file=ostream)
+
+  def makeProblematicChannelsCSV(self, all_channels=False, output=None):
+    """
+      Make CSV File for channels, location, flag list, and values
+    """
+    cols = [
+      'dbid',
+      'iEta','iPhi','iX','iY','iZ',
+      'SM','TT',
+      'PED_ON_MEAN_G1','PED_ON_MEAN_G6','PED_ON_MEAN_G12',
+      'PED_ON_RMS_G1','PED_ON_RMS_G6','PED_ON_RMS_G12',
+      'PED_OFF_MEAN_G1','PED_OFF_MEAN_G6','PED_OFF_MEAN_G12',
+      'PED_OFF_RMS_G1','PED_OFF_RMS_G6','PED_OFF_RMS_G12',
+      'ADC_MEAN_G1','ADC_MEAN_G6','ADC_MEAN_G12',
+      'ADC_RMS_G1','ADC_RMS_G6','ADC_RMS_G12',
+      'APD_MEAN','APD_RMS','APD_OVER_PN_MEAN',
+      'Flags'
+    ]
+    csv_dict = {col: [] for col in cols}
+
+    self.getAllChannelData()
+    self.getFlagsForAllChannels() 
+    if all_channels:
+      channels = self.getActiveChannels()
+    else:
+      channels = self.getProblematicChannels()
+    for dbid in channels:
+      flags = self.getFlagsForChannel(dbid)
+      if flags:
+        flags = ', '.join(flags)
+      else:
+        flags = 'NONE'
+      if getSubDetector(dbid) == 'EE':
+        x, y, z = getXYZ(dbid)
+        ieta = iphi = 'N/A'
+      else:
+        ieta, iphi = getEtaPhi(dbid)
+        x = y = z = 'N/A'
+      sm = getDetSM(dbid)
+      tt = getTT(dbid)
+      if self.has_ped_hvon:
+        hvon_mean_g1, hvon_mean_g6, hvon_mean_g12 = self.getHvonMeanData(dbid)
+        hvon_rms_g1, hvon_rms_g6, hvon_rms_g12 = self.getHvonRmsData(dbid)
+      else:
+        hvon_mean_g1 = hvon_mean_g6 = hvon_mean_g12 = 'N/A'
+        hvon_rms_g1 = hvon_rms_g6 = hvon_rms_g12 = 'N/A'
+      if self.has_ped_hvoff:
+        hvoff_mean_g1, hvoff_mean_g6, hvoff_mean_g12 = self.getHvoffMeanData(dbid)
+        hvoff_rms_g1, hvoff_rms_g6, hvoff_rms_g12 = self.getHvoffRmsData(dbid)
+      else:
+        hvoff_mean_g1 = hvoff_mean_g6 = hvoff_mean_g12 = 'N/A'
+        hvoff_rms_g1 = hvoff_rms_g6 = hvoff_rms_g12 = 'N/A'
+      if self.has_testpulse:
+        test_pulse_mean_g1, test_pulse_mean_g6, test_pulse_mean_g12 = self.getTestPulseMeanData(dbid)
+        test_pulse_rms_g1, test_pulse_rms_g6, test_pulse_rms_g12 = self.getTestPulseRmsData(dbid)
+      else:
+        test_pulse_mean_g1 = test_pulse_mean_g6 = test_pulse_mean_g12 = 'N/A'
+        test_pulse_rms_g1 = test_pulse_rms_g6 = test_pulse_rms_g12 = 'N/A'
+      if self.has_laser:
+        laser_mean, laser_rms, laser_over_pn_mean = self.getLaserData(dbid)
+      else:
+        laser_mean = laser_rms = laser_over_pn_mean = 'N/A'
+      row = {
+            'dbid': dbid,
+            'iEta': ieta, 'iPhi': iphi, 'iX': x, 'iY': y, 'iZ': z,
+            'SM': sm, 'TT': tt,
+            'PED_ON_MEAN_G1': hvon_mean_g1,
+            'PED_ON_MEAN_G6': hvon_mean_g6,
+            'PED_ON_MEAN_G12': hvon_mean_g12,
+            'PED_ON_RMS_G1': hvon_rms_g1,
+            'PED_ON_RMS_G6': hvon_rms_g6,
+            'PED_ON_RMS_G12': hvon_rms_g12,
+            'PED_OFF_MEAN_G1': hvoff_mean_g1,
+            'PED_OFF_MEAN_G6': hvoff_mean_g6,
+            'PED_OFF_MEAN_G12': hvoff_mean_g12,
+            'PED_OFF_RMS_G1': hvoff_rms_g1,
+            'PED_OFF_RMS_G6': hvoff_rms_g6,
+            'PED_OFF_RMS_G12': hvoff_rms_g12,
+            'ADC_MEAN_G1': test_pulse_mean_g1,
+            'ADC_MEAN_G6': test_pulse_mean_g6,
+            'ADC_MEAN_G12': test_pulse_mean_g12,
+            'ADC_RMS_G1': test_pulse_rms_g1,
+            'ADC_RMS_G6': test_pulse_rms_g6,
+            'ADC_RMS_G12': test_pulse_rms_g12,
+            'APD_MEAN': laser_mean,
+            'APD_RMS': laser_rms,
+            'APD_OVER_PN_MEAN': laser_over_pn_mean,
+            'Flags': flags
+        }
+      for col in cols:
+        csv_dict[col].append(row[col])
+    csv_df = pd.DataFrame(data=csv_dict)
+    csv_df.to_csv(output, index = False)    
 
   def printProblematicChannelsTable(self, output=None):
     """
