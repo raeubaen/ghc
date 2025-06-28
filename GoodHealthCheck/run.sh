@@ -11,7 +11,7 @@ fi
 
 # . "$HOME/lcg-example/bin/activate"
 
-cd "$HOME/ghc/GoodHealthCheck"
+#cd "$HOME/ghc/GoodHealthCheck"
 
 
 python3 ghc.py "$@"

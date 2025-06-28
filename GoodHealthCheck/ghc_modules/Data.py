@@ -16,8 +16,8 @@ import time
 from psycopg2.extras import execute_values
 from thresholds import CONFIG
 
-# Load the CSV into a DataFrame    
-ecalchannels_path = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
+# Load the CSV into a DataFrame
+ecalchannels_path = 'ecalchannels.csv'
 df = pd.read_csv(ecalchannels_path, header=0)
     
 logger = logging.getLogger()
@@ -89,11 +89,11 @@ class Data(object):
     """
     valuekeysDict = {}
     if not reverse:
-      with open(r'/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/VALUEKEYS.txt', 'r') as f:
+      with open(r'VALUEKEYS.txt', 'r') as f:
         for line in f:
           valuekeysDict[line.strip().split()[0]] = line.strip().split()[1] 
     else:
-      with open(r'/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/VALUEKEYS.txt', 'r') as f:
+      with open(r'VALUEKEYS.txt', 'r') as f:
         for line in f:
           valuekeysDict[line.strip().split()[1]] = line.strip().split()[0] 
     return valuekeysDict 
@@ -360,7 +360,7 @@ class Data(object):
       return result
 
   def PedestalComparison(self, channel, gain):
-    det = getSubDetector(channel) 
+    det = getSubDetector(channel)
     tmpflags = []
     mean = self.getChannelData(channel, key='PED_ON_MEAN_' + gain)
     rms = self.getChannelData(channel, key='PED_ON_RMS_' + gain)
@@ -759,15 +759,15 @@ class Data(object):
         result = c._oradbh.cursor().execute(sql, (iov,))
       else:
         subprocess.run([
-            "python3", 
-            "laser-proc/main.py", 
-            "laser-proc/runlist.csv", 
-            "/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/"
+            "python3",
+            "laser-proc/main.py",
+            "laser-proc/runlist.csv",
+            "laser-proc/output/"
         ])
         fields = ['APD_MEAN', 'APD_OVER_PN_MEAN', 'APD_RMS']
-        apd_mean = pd.read_csv(f"/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/LT_Amp_{run}.csv", header=0)
-        apd_over_pn_mean = pd.read_csv(f"/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/LT_AmpOverPN_{run}.csv", header=0)
-        apd_rms = pd.read_csv(f"/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/LT_RMS_{run}.csv", header=0)
+        apd_mean = pd.read_csv(f"laser-proc/output/LT_Amp_{run}.csv", header=0)
+        apd_over_pn_mean = pd.read_csv(f"laser-proc/output/LT_AmpOverPN_{run}.csv", header=0)
+        apd_rms = pd.read_csv(f"laser-proc/output/LT_RMS_{run}.csv", header=0)
         result = merge(apd_mean, apd_over_pn_mean, apd_rms)
 
       cur.close()
@@ -1057,14 +1057,6 @@ def getChannelInfo(c):
   info.update(c.getChDict(c))
   return info
 
-
-# def getChDict(channel):
-#   # cur_chdb.execute("SELECT * FROM channels WHERE dbId = %s", (channel,))
-#   # cur_chdb.execute("SELECT * FROM channels WHERE dbId = ?", (channel,))
-#   # return cur_chdb.fetchone()
-#   return pfgutils.connection.getChDict(channel=)
-
-
 def getTT(channel):
   """
     Returns TT number for channel
@@ -1126,6 +1118,7 @@ def getSubDetector(channel):
     Returns EB|EE detector place of channel
   """
   c = connection.Connection()
+  print(c.getChDict(channel))
   return c.getChDict(channel)['det'][:2]
 
 

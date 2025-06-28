@@ -127,7 +127,7 @@ def getHistsDbIds(data):
 
 def getCanvasHistDbIds(data):
   # data has 'value' = ((dbid, value), (dbid, value), ...)
-  import pfgutils.connection as conn
+  import connection as conn
   c = conn.Connection()
   from copy import deepcopy
   if 'values' not in data:

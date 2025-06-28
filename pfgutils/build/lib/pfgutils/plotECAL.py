@@ -127,9 +127,9 @@ def getHistsDbIds(data):
 
 def getCanvasHistDbIds(data):
   # data has 'value' = ((dbid, value), (dbid, value), ...)
-  from pfgutils.connection import ecalchannels
+  import pfgutils.connection as conn
+  c = conn.Connection()
   from copy import deepcopy
-  cur = ecalchannels.cursor()
   if 'values' not in data:
     logging.warning("Key 'values' not found in data")
     return None
@@ -145,26 +145,27 @@ def getCanvasHistDbIds(data):
   #   channels[row[0]] = row[1:]
   for dbid, value in data['values']:
     # det, ix, iy, iz, iphi, ieta = channels[dbid]
-    cur.execute("SELECT ieta, iphi, ix, iy, iz, det FROM channels WHERE dbId = ?", (dbid,))
-    data = cur.fetchone()
-    if 'EB' in data['det']:
+    #cur.execute("SELECT ieta, iphi, ix, iy, iz, det FROM channels WHERE dbId = ?", (dbid,))
+    #data = [c.getChDict(dbid)[x] for x in [ieta, iphi, ix, iy, iz, det]]
+    #data = cur.fetchone()
+    if 'EB' in c.getChDict(dbid)['det']:
       key = 'eb'
-      x, y = data['iphi'], data['ieta']
-    elif 'EE+' in data['det']:
+      x, y = c.getChDict(dbid)['iphi'], c.getChDict(dbid)['ieta']
+    elif 'EE+' in c.getChDict(dbid)['det']:
       key = 'ee+'
-      x, y = data['ix'], data['iy']
-    elif 'EE-' in data['det']:
+      x, y = c.getChDict(dbid)['ix'], c.getChDict(dbid)['iy']
+    elif 'EE-' in c.getChDict(dbid)['det']:
       key = 'ee-'
-      x, y = data['ix'], data['iy']
+      x, y = c.getChDict(dbid)['ix'], c.getChDict(dbid)['iy']
     else:
       return
     newdata[key].append(((x, y), value))
+ # return newdata
   return getCanvasHist(newdata)
-
 
 def getCanvasHist(data):
   ROOT.gStyle.SetOptStat(0)
-  ROOT.gStyle.SetNumberContours(15)
+  #ROOT.guse_rms = 'RMS' in keyStyle.SetNumberContours(15)
   name = "Unnamed" if 'name' not in data else str(data['name'])
   title = "Unnamed" if 'name' not in data else str(data['title'])
   if name != "Unnamed" and title == "Unnamed":
@@ -255,25 +256,26 @@ def getCanvasHist(data):
         EE2.Fill(x - 1, y - 1, value)
       else:
         EE1.Fill(x - 1, y - 1, value)
-
+  c.SetCanvasSize(3600, 2710)
   # plot Barrel
   pad = c.cd(1)
-  pad.SetCanvasSize(3600, 1710)
+  pad.SetPad(0, 0.37, 1, 1)
   EB.Draw('colz')
   _drawEBextra(c, 1)
 
   # Endcap
   pad0 = c.cd(2)
   pad0.Divide(2, 1)
-
+  pad0.SetPad(0, 0, 1, 0.37)
+  
   # Endcap z = -1
   pad1 = pad0.cd(1)
-  pad1.SetCanvasSize(1000, 1000)
+  pad1.SetPad(0, 0, 0.5, 1)
 
   EE1.Draw("colz")
   _drawEEextra(pad0, 1, -1)
   pad2 = pad0.cd(2)
-  pad2.SetCanvasSize(1000, 1000)
+  pad2.SetPad(0.5, 0, 1, 1)
   EE2.Draw("colz")
   _drawEEextra(pad0, 2, 1)
 

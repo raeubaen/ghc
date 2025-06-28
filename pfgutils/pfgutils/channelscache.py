@@ -1,6 +1,6 @@
 #/usr/bin/env python
 
-from pfgutils.connection import ecalchannels
+from connection import ecalchannels
 
 channels = {}
 

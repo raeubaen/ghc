@@ -9,10 +9,11 @@ max_good_status = 3
 Oracle = { # Oracle user
   'user': 'CMS_ECAL_R', # Oracle password
   'password': '3c4l_r34d3r', # Oracle SID
-  'SID': 'cms_tstore'}
+  'SID': 'cms_tstore.cern.ch'}
 
-Database = {# PostgreSQL options
-  'driver': 'postgresql', 'options': {'host': "128.142.136.43 ", 'user': 'pfgreadonly', 'password': 'ecalpfg'}}
+Database = { # PostgreSQL options
+  'driver': 'postgresql', 'options': {'host': "128.142.136.43", 'user': 'pfgreadonly', 'password': 'ecalpfg'}
+}
 
 tmpdir = "/tmp"
 rootpath = os.path.join("/var/www/downloads")

@@ -80,14 +80,18 @@ The following rules are used for assign some flags to channels:
 How to use
 ==========
 
-**for new data base**
+** Setup ** 
+  source /cvmfs/sft.cern.ch/lcg/views/LCG_106/x86_64-el9-gcc13-opt/setup.sh
 
-    source setup.sh
+  cd pfgutils
+  pip install -e .
+
+  ssh -o ExitOnForwardFailure=yes -f -N -L 10121:cmsonr1-v.cern.ch:10121 USERNAME@cmsusr.cern.ch 
 
 **Example of analyse GHC1**
-    
-    source setup.sh
+    cd GoodHealthCheck
     python ghc.py -h
     python ghc.py --csv -o "results" -pon "392414" -poff "390112" -tp "392424" -l "392430" 1 |& tee ghc.log
     python clear_ghc_data.py -s 1 -e 1
-You should see various output about channels.
+
+You should see various output about channels in the results folder

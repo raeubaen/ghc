@@ -1,4 +1,3 @@
-.gitignore
 README.md
 setup.py
 dist/pfgutils-0.4-py3.11.egg
@@ -7,17 +6,15 @@ externals/source-all.sh
 pfgutils/Settings.py
 pfgutils/__init__.py
 pfgutils/certificationstatus.py
+pfgutils/ch_dict.pkl
 pfgutils/channelscache.py
 pfgutils/cmssw.py
-pfgutils/connection.py
 pfgutils/constants.py
 pfgutils/ecalchannels.db
 pfgutils/ecalchannels.sql
 pfgutils/getrunlist.py
 pfgutils/ghc.log
-pfgutils/laser.py
 pfgutils/misc.py
-pfgutils/noise.py
 pfgutils/oracle.py
 pfgutils/plotECAL.py
 pfgutils/runchecker.py

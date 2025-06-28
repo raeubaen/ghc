@@ -1,0 +1,139 @@
+|_. Channel ID |_\2.              Info              |_.                  Flags                   |
+| 1011010726 | iEta=+37 iPhi= 15 | EB+1  TT30 | BPG6+DPG1+DPG12                          |
+| 1011021006 | iEta=+51 iPhi= 35 | EB+2  TT42 | DPG1+DPG12+DPG6                          |
+| 1011021007 | iEta=+51 iPhi= 34 | EB+2  TT42 | DPG1+DPG12+DPG6                          |
+| 1011021008 | iEta=+51 iPhi= 33 | EB+2  TT42 | DPG1+DPG12+DPG6                          |
+| 1011021009 | iEta=+51 iPhi= 32 | EB+2  TT42 | DPG1+DPG12+DPG6                          |
+| 1011021010 | iEta=+51 iPhi= 31 | EB+2  TT42 | DPG1+DPG12+DPG6                          |
+| 1011030608 | iEta=+31 iPhi= 53 | EB+3  TT26 | DPG1+DPG12+DPG6                          |
+| 1011030713 | iEta=+36 iPhi= 48 | EB+3  TT31 | BPG12+BPG6+DPG1                          |
+| 1011031213 | iEta=+61 iPhi= 48 | EB+3  TT51 | LRG1+VLRG12+VLRG6                        |
+| 1011040071 | iEta=+4 iPhi= 70 | EB+4  TT 3  | LRG12                                    |
+| 1011040213 | iEta=+11 iPhi= 68 | EB+4  TT11 | LRG1+VLRG12+VLRG6                        |
+| 1011040254 | iEta=+13 iPhi= 67 | EB+4  TT11 | LRG12                                    |
+| 1011040391 | iEta=+20 iPhi= 70 | EB+4  TT15 | LRG6+VLRG12                              |
+| 1011040950 | iEta=+48 iPhi= 71 | EB+4  TT38 | DPG6                                     |
+| 1011041347 | iEta=+68 iPhi= 74 | EB+4  TT54 | LRG12                                    |
+| 1011060503 | iEta=+26 iPhi=118 | EB+6  TT21 | BPG1+DPG12+DPG6                          |
+| 1011061528 | iEta=+77 iPhi=113 | EB+6  TT62 | DPG12                                    |
+| 1011081315 | iEta=+66 iPhi=146 | EB+8  TT55 | BPG1+DPG12+DPG6                          |
+| 1011081358 | iEta=+68 iPhi=143 | EB+8  TT56 | BPG12+VLRG1+VLRG12+VLRG6                 |
+| 1011081417 | iEta=+71 iPhi=144 | EB+8  TT60 | DPG1                                     |
+| 1011090160 | iEta=+8 iPhi=161 | EB+9  TT 8  | BPG12+DPG1+DPG6                          |
+| 1011090886 | iEta=+45 iPhi=175 | EB+9  TT34 | LRG6+VLRG12                              |
+| 1011091125 | iEta=+57 iPhi=176 | EB+9  TT45 | VLRG1+VLRG12+VLRG6                       |
+| 1011100118 | iEta=+6 iPhi=183 | EB+10 TT 8  | DPG1+DPG12+DPG6                          |
+| 1011101073 | iEta=+54 iPhi=188 | EB+10 TT43 | BPG12+BPG6                               |
+| 1011101550 | iEta=+78 iPhi=191 | EB+10 TT62 | LRG1+VLRG12+VLRG6                        |
+| 1011110445 | iEta=+23 iPhi=216 | EB+11 TT17 | BPG1                                     |
+| 1011111162 | iEta=+59 iPhi=219 | EB+11 TT45 | BPG1                                     |
+| 1011121616 | iEta=+81 iPhi=225 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121617 | iEta=+81 iPhi=224 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121618 | iEta=+81 iPhi=223 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121619 | iEta=+81 iPhi=222 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121620 | iEta=+81 iPhi=221 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121636 | iEta=+82 iPhi=225 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121637 | iEta=+82 iPhi=224 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121638 | iEta=+82 iPhi=223 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121639 | iEta=+82 iPhi=222 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121640 | iEta=+82 iPhi=221 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121656 | iEta=+83 iPhi=225 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121657 | iEta=+83 iPhi=224 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121658 | iEta=+83 iPhi=223 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121659 | iEta=+83 iPhi=222 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011121660 | iEta=+83 iPhi=221 | EB+12 TT68 | DPG1+DPG12+DPG6                          |
+| 1011130608 | iEta=+31 iPhi=253 | EB+13 TT26 | BPG1+BPG12+BPG6+VLRG1+VLRG12+VLRG6       |
+| 1011130857 | iEta=+43 iPhi=244 | EB+13 TT36 | DPG1+DPG12+DPG6                          |
+| 1011141359 | iEta=+68 iPhi=262 | EB+14 TT56 | BPG12+DPG6                               |
+| 1011151260 | iEta=+63 iPhi=281 | EB+15 TT52 | LRG6+VLRG12                              |
+| 1011160115 | iEta=+6 iPhi=306 | EB+16 TT 7  | BPG12                                    |
+| 1011160389 | iEta=+20 iPhi=312 | EB+16 TT14 | VLRG12+VLRG6                             |
+| 1011160874 | iEta=+44 iPhi=307 | EB+16 TT35 | LRG1+VLRG12+VLRG6                        |
+| 1011161325 | iEta=+67 iPhi=316 | EB+16 TT53 | VLRG12+VLRG6                             |
+| 1011170675 | iEta=+34 iPhi=326 | EB+17 TT27 | DPG12+DPG6                               |
+| 1011170912 | iEta=+46 iPhi=329 | EB+17 TT39 | VLRG12+VLRG6                             |
+| 1011170965 | iEta=+49 iPhi=336 | EB+17 TT37 | VLRG1+VLRG12+VLRG6                       |
+| 1011171319 | iEta=+66 iPhi=322 | EB+17 TT56 | BPG12+DPG6                               |
+| 1011180898 | iEta=+45 iPhi=343 | EB+18 TT36 | BPG12+DPG6                               |
+| 1011181487 | iEta=+75 iPhi=354 | EB+18 TT58 | DPG1+DPG12+DPG6                          |
+| 1011191017 | iEta=-51 iPhi= 17 | EB-1  TT44 | BPG6+DPG1+DPG12                          |
+| 1011191501 | iEta=-76 iPhi=  1 | EB-1  TT61 | BPG6+DPG12                               |
+| 1011191502 | iEta=-76 iPhi=  2 | EB-1  TT61 | DPG12                                    |
+| 1011191503 | iEta=-76 iPhi=  3 | EB-1  TT61 | BPG6+DPG12                               |
+| 1011191504 | iEta=-76 iPhi=  4 | EB-1  TT61 | DPG12                                    |
+| 1011191505 | iEta=-76 iPhi=  5 | EB-1  TT61 | BPG6+DPG12                               |
+| 1011200113 | iEta=-6 iPhi= 33 | EB-2  TT 7  | LRG12                                    |
+| 1011200626 | iEta=-32 iPhi= 26 | EB-2  TT26 | VLRG12+VLRG6                             |
+| 1011210102 | iEta=-6 iPhi= 42 | EB-3  TT 5  | LRG6+VLRG12                              |
+| 1011210190 | iEta=-10 iPhi= 50 | EB-3  TT 6 | BPG12+VLRG1+VLRG12+VLRG6                 |
+| 1011211286 | iEta=-65 iPhi= 46 | EB-3  TT50 | BPG1                                     |
+| 1011220665 | iEta=-34 iPhi= 65 | EB-4  TT25 | BPG12+BPG6+DPG1                          |
+| 1011220965 | iEta=-49 iPhi= 65 | EB-4  TT37 | BPG6+DPG1+DPG12                          |
+| 1011230546 | iEta=-28 iPhi= 86 | EB-5  TT22 | LRG12                                    |
+| 1011231597 | iEta=-80 iPhi= 97 | EB-5  TT64 | LRG12                                    |
+| 1011241053 | iEta=-53 iPhi=113 | EB-6  TT43 | LRG6+VLRG12                              |
+| 1011250691 | iEta=-35 iPhi=131 | EB-7  TT27 | LRG6+VLRG12                              |
+| 1011250781 | iEta=-40 iPhi=121 | EB-7  TT29 | BPG12                                    |
+| 1011251313 | iEta=-66 iPhi=133 | EB-7  TT55 | BPG12+VLRG12+VLRG6                       |
+| 1011260481 | iEta=-25 iPhi=141 | EB-8  TT17 | LRG6+VLRG12                              |
+| 1011270480 | iEta=-24 iPhi=180 | EB-9  TT20 | VLRG1                                    |
+| 1011270749 | iEta=-38 iPhi=169 | EB-9  TT30 | DPG1+DPG12+DPG6                          |
+| 1011271385 | iEta=-70 iPhi=165 | EB-9  TT53 | BPG12                                    |
+| 1011280006 | iEta=-1 iPhi=186 | EB-10 TT 2  | LRG6+VLRG12                              |
+| 1011280040 | iEta=-2 iPhi=200 | EB-10 TT 4  | LRG12                                    |
+| 1011280106 | iEta=-6 iPhi=186 | EB-10 TT 6  | LRG12                                    |
+| 1011280468 | iEta=-24 iPhi=188 | EB-10 TT18 | VLRG12+VLRG6                             |
+| 1011280748 | iEta=-38 iPhi=188 | EB-10 TT30 | BPG12+DPG1+DPG6                          |
+| 1011280847 | iEta=-43 iPhi=187 | EB-10 TT34 | LRG6+VLRG12                              |
+| 1011281016 | iEta=-51 iPhi=196 | EB-10 TT44 | LRG12                                    |
+| 1011281426 | iEta=-72 iPhi=186 | EB-10 TT58 | LRG6+VLRG12                              |
+| 1011281538 | iEta=-77 iPhi=198 | EB-10 TT64 | LRG1+VLRG12+VLRG6                        |
+| 1011281690 | iEta=-85 iPhi=190 | EB-10 TT66 | LRG12                                    |
+| 1011291280 | iEta=-64 iPhi=220 | EB-11 TT52 | LRG6+VLRG12                              |
+| 1011291281 | iEta=-65 iPhi=201 | EB-11 TT49 | VLRG12+VLRG6                             |
+| 1011291294 | iEta=-65 iPhi=214 | EB-11 TT51 | LRG12                                    |
+| 1011291456 | iEta=-73 iPhi=216 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291457 | iEta=-73 iPhi=217 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291458 | iEta=-73 iPhi=218 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291459 | iEta=-73 iPhi=219 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291460 | iEta=-73 iPhi=220 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291476 | iEta=-74 iPhi=216 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291477 | iEta=-74 iPhi=217 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291478 | iEta=-74 iPhi=218 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291479 | iEta=-74 iPhi=219 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291480 | iEta=-74 iPhi=220 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291496 | iEta=-75 iPhi=216 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291497 | iEta=-75 iPhi=217 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291498 | iEta=-75 iPhi=218 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291499 | iEta=-75 iPhi=219 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291500 | iEta=-75 iPhi=220 | EB-11 TT60 | DPG1+DPG12+DPG6                          |
+| 1011291597 | iEta=-80 iPhi=217 | EB-11 TT64 | VLRG12+VLRG6                             |
+| 1011310420 | iEta=-21 iPhi=260 | EB-13 TT20 | BPG1+DPG12+DPG6                          |
+| 1011310499 | iEta=-25 iPhi=259 | EB-13 TT20 | DPG1+DPG12+DPG6                          |
+| 1011310585 | iEta=-30 iPhi=245 | EB-13 TT21 | BPG6+DPG1+DPG12                          |
+| 1011311361 | iEta=-69 iPhi=241 | EB-13 TT53 | DPG1+DPG12+DPG6                          |
+| 1011320207 | iEta=-11 iPhi=267 | EB-14 TT10 | DPG12                                    |
+| 1011321154 | iEta=-58 iPhi=274 | EB-14 TT47 | VLRG1+VLRG12+VLRG6                       |
+| 1011321157 | iEta=-58 iPhi=277 | EB-14 TT48 | VLRG12+VLRG6                             |
+| 1011321160 | iEta=-58 iPhi=280 | EB-14 TT48 | LRG12                                    |
+| 1011321194 | iEta=-60 iPhi=274 | EB-14 TT47 | LRG1+VLRG12+VLRG6                        |
+| 1011330019 | iEta=-1 iPhi=299 | EB-15 TT 4  | BPG1                                     |
+| 1011330329 | iEta=-17 iPhi=289 | EB-15 TT14 | DPG1+DPG12+DPG6                          |
+| 1011331127 | iEta=-57 iPhi=287 | EB-15 TT46 | VLRG12+VLRG6                             |
+| 1011331150 | iEta=-58 iPhi=290 | EB-15 TT46 | VLRG1+VLRG12+VLRG6                       |
+| 1011340880 | iEta=-44 iPhi=320 | EB-16 TT36 | LRG12+LRG6                               |
+| 1011341646 | iEta=-83 iPhi=306 | EB-16 TT66 | DPG1+DPG12+DPG6                          |
+| 1011350756 | iEta=-38 iPhi=336 | EB-17 TT32 | DPG1+DPG12+DPG6                          |
+| 2010016068 | iX=+16 iY=+68 iZ=-1 | EE-2  TT15 | DPG6                                     |
+| 2010041002 | iX=+41 iY= +2 iZ=-1 | EE-5  TT13 | BPG1+DPG12+DPG6                          |
+| 2010064062 | iX=+64 iY=+62 iZ=-1 | EE-8  TT18 | DPG1+DPG12+DPG6                          |
+| 2010069046 | iX=+69 iY=+46 iZ=-1 | EE-7  TT11 | BPG12                                    |
+| 2010086047 | iX=+86 iY=+47 iZ=-1 | EE-7  TT15 | BPG12                                    |
+| 2012005048 | iX= +5 iY=+48 iZ=+1 | EE+3  TT17 | LRG12                                    |
+| 2012006038 | iX= +6 iY=+38 iZ=+1 | EE+3  TT29 | LRG12                                    |
+| 2012007038 | iX= +7 iY=+38 iZ=+1 | EE+3  TT29 | LRG12                                    |
+| 2012008038 | iX= +8 iY=+38 iZ=+1 | EE+3  TT29 | LRG12                                    |
+| 2012009038 | iX= +9 iY=+38 iZ=+1 | EE+3  TT29 | LRG12                                    |
+| 2012010038 | iX=+10 iY=+38 iZ=+1 | EE+3  TT29 | LRG6+VLRG12                              |
+| 2012027075 | iX=+27 iY=+75 iZ=+1 | EE+2  TT 7 | BPG1+LRG1                                |
+| 2012041059 | iX=+41 iY=+59 iZ=+1 | EE+2  TT25 | LRG12                                    |

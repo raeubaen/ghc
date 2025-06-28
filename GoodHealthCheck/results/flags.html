@@ -1,0 +1,853 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="../ghc.css" type="text/css" />
+  <!-- SortTable, by Stuart Langridge, http://www.kryogenix.org/code/browser/sorttable/ -->
+  <script src="../sorttable.js"></script>
+  <!-- MathJAX -->
+  <script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+<body>
+	<table>
+		<tr>
+			<th>Channel ID </th>
+			<th colspan="2">             Info              </th>
+			<th>                 Flags                   </th>
+		</tr>
+		<tr>
+			<td> 1011010726 </td>
+			<td> iEta=+37 iPhi= 15 </td>
+			<td> EB+1  TT30 </td>
+			<td> <span class="caps">BPG</span>6+DPG1+DPG12                          </td>
+		</tr>
+		<tr>
+			<td> 1011021006 </td>
+			<td> iEta=+51 iPhi= 35 </td>
+			<td> EB+2  TT42 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011021007 </td>
+			<td> iEta=+51 iPhi= 34 </td>
+			<td> EB+2  TT42 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011021008 </td>
+			<td> iEta=+51 iPhi= 33 </td>
+			<td> EB+2  TT42 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011021009 </td>
+			<td> iEta=+51 iPhi= 32 </td>
+			<td> EB+2  TT42 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011021010 </td>
+			<td> iEta=+51 iPhi= 31 </td>
+			<td> EB+2  TT42 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011030608 </td>
+			<td> iEta=+31 iPhi= 53 </td>
+			<td> EB+3  TT26 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011030713 </td>
+			<td> iEta=+36 iPhi= 48 </td>
+			<td> EB+3  TT31 </td>
+			<td> <span class="caps">BPG</span>12+BPG6+DPG1                          </td>
+		</tr>
+		<tr>
+			<td> 1011031213 </td>
+			<td> iEta=+61 iPhi= 48 </td>
+			<td> EB+3  TT51 </td>
+			<td> <span class="caps">LRG</span>1+VLRG12+VLRG6                        </td>
+		</tr>
+		<tr>
+			<td> 1011040071 </td>
+			<td> iEta=+4 iPhi= 70 </td>
+			<td> EB+4  TT 3  </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011040213 </td>
+			<td> iEta=+11 iPhi= 68 </td>
+			<td> EB+4  TT11 </td>
+			<td> <span class="caps">LRG</span>1+VLRG12+VLRG6                        </td>
+		</tr>
+		<tr>
+			<td> 1011040254 </td>
+			<td> iEta=+13 iPhi= 67 </td>
+			<td> EB+4  TT11 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011040391 </td>
+			<td> iEta=+20 iPhi= 70 </td>
+			<td> EB+4  TT15 </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 1011040950 </td>
+			<td> iEta=+48 iPhi= 71 </td>
+			<td> EB+4  TT38 </td>
+			<td> <span class="caps">DPG</span>6                                     </td>
+		</tr>
+		<tr>
+			<td> 1011041347 </td>
+			<td> iEta=+68 iPhi= 74 </td>
+			<td> EB+4  TT54 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011060503 </td>
+			<td> iEta=+26 iPhi=118 </td>
+			<td> EB+6  TT21 </td>
+			<td> <span class="caps">BPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011061528 </td>
+			<td> iEta=+77 iPhi=113 </td>
+			<td> EB+6  TT62 </td>
+			<td> <span class="caps">DPG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011081315 </td>
+			<td> iEta=+66 iPhi=146 </td>
+			<td> EB+8  TT55 </td>
+			<td> <span class="caps">BPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011081358 </td>
+			<td> iEta=+68 iPhi=143 </td>
+			<td> EB+8  TT56 </td>
+			<td> <span class="caps">BPG</span>12+VLRG1+VLRG12+VLRG6                 </td>
+		</tr>
+		<tr>
+			<td> 1011081417 </td>
+			<td> iEta=+71 iPhi=144 </td>
+			<td> EB+8  TT60 </td>
+			<td> <span class="caps">DPG</span>1                                     </td>
+		</tr>
+		<tr>
+			<td> 1011090160 </td>
+			<td> iEta=+8 iPhi=161 </td>
+			<td> EB+9  TT 8  </td>
+			<td> <span class="caps">BPG</span>12+DPG1+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011090886 </td>
+			<td> iEta=+45 iPhi=175 </td>
+			<td> EB+9  TT34 </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 1011091125 </td>
+			<td> iEta=+57 iPhi=176 </td>
+			<td> EB+9  TT45 </td>
+			<td> <span class="caps">VLRG</span>1+VLRG12+VLRG6                       </td>
+		</tr>
+		<tr>
+			<td> 1011100118 </td>
+			<td> iEta=+6 iPhi=183 </td>
+			<td> EB+10 TT 8  </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011101073 </td>
+			<td> iEta=+54 iPhi=188 </td>
+			<td> EB+10 TT43 </td>
+			<td> <span class="caps">BPG</span>12+BPG6                               </td>
+		</tr>
+		<tr>
+			<td> 1011101550 </td>
+			<td> iEta=+78 iPhi=191 </td>
+			<td> EB+10 TT62 </td>
+			<td> <span class="caps">LRG</span>1+VLRG12+VLRG6                        </td>
+		</tr>
+		<tr>
+			<td> 1011110445 </td>
+			<td> iEta=+23 iPhi=216 </td>
+			<td> EB+11 TT17 </td>
+			<td> <span class="caps">BPG</span>1                                     </td>
+		</tr>
+		<tr>
+			<td> 1011111162 </td>
+			<td> iEta=+59 iPhi=219 </td>
+			<td> EB+11 TT45 </td>
+			<td> <span class="caps">BPG</span>1                                     </td>
+		</tr>
+		<tr>
+			<td> 1011121616 </td>
+			<td> iEta=+81 iPhi=225 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121617 </td>
+			<td> iEta=+81 iPhi=224 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121618 </td>
+			<td> iEta=+81 iPhi=223 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121619 </td>
+			<td> iEta=+81 iPhi=222 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121620 </td>
+			<td> iEta=+81 iPhi=221 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121636 </td>
+			<td> iEta=+82 iPhi=225 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121637 </td>
+			<td> iEta=+82 iPhi=224 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121638 </td>
+			<td> iEta=+82 iPhi=223 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121639 </td>
+			<td> iEta=+82 iPhi=222 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121640 </td>
+			<td> iEta=+82 iPhi=221 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121656 </td>
+			<td> iEta=+83 iPhi=225 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121657 </td>
+			<td> iEta=+83 iPhi=224 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121658 </td>
+			<td> iEta=+83 iPhi=223 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121659 </td>
+			<td> iEta=+83 iPhi=222 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011121660 </td>
+			<td> iEta=+83 iPhi=221 </td>
+			<td> EB+12 TT68 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011130608 </td>
+			<td> iEta=+31 iPhi=253 </td>
+			<td> EB+13 TT26 </td>
+			<td> <span class="caps">BPG</span>1+BPG12+BPG6+VLRG1+VLRG12+VLRG6       </td>
+		</tr>
+		<tr>
+			<td> 1011130857 </td>
+			<td> iEta=+43 iPhi=244 </td>
+			<td> EB+13 TT36 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011141359 </td>
+			<td> iEta=+68 iPhi=262 </td>
+			<td> EB+14 TT56 </td>
+			<td> <span class="caps">BPG</span>12+DPG6                               </td>
+		</tr>
+		<tr>
+			<td> 1011151260 </td>
+			<td> iEta=+63 iPhi=281 </td>
+			<td> EB+15 TT52 </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 1011160115 </td>
+			<td> iEta=+6 iPhi=306 </td>
+			<td> EB+16 TT 7  </td>
+			<td> <span class="caps">BPG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011160389 </td>
+			<td> iEta=+20 iPhi=312 </td>
+			<td> EB+16 TT14 </td>
+			<td> <span class="caps">VLRG</span>12+VLRG6                             </td>
+		</tr>
+		<tr>
+			<td> 1011160874 </td>
+			<td> iEta=+44 iPhi=307 </td>
+			<td> EB+16 TT35 </td>
+			<td> <span class="caps">LRG</span>1+VLRG12+VLRG6                        </td>
+		</tr>
+		<tr>
+			<td> 1011161325 </td>
+			<td> iEta=+67 iPhi=316 </td>
+			<td> EB+16 TT53 </td>
+			<td> <span class="caps">VLRG</span>12+VLRG6                             </td>
+		</tr>
+		<tr>
+			<td> 1011170675 </td>
+			<td> iEta=+34 iPhi=326 </td>
+			<td> EB+17 TT27 </td>
+			<td> <span class="caps">DPG</span>12+DPG6                               </td>
+		</tr>
+		<tr>
+			<td> 1011170912 </td>
+			<td> iEta=+46 iPhi=329 </td>
+			<td> EB+17 TT39 </td>
+			<td> <span class="caps">VLRG</span>12+VLRG6                             </td>
+		</tr>
+		<tr>
+			<td> 1011170965 </td>
+			<td> iEta=+49 iPhi=336 </td>
+			<td> EB+17 TT37 </td>
+			<td> <span class="caps">VLRG</span>1+VLRG12+VLRG6                       </td>
+		</tr>
+		<tr>
+			<td> 1011171319 </td>
+			<td> iEta=+66 iPhi=322 </td>
+			<td> EB+17 TT56 </td>
+			<td> <span class="caps">BPG</span>12+DPG6                               </td>
+		</tr>
+		<tr>
+			<td> 1011180898 </td>
+			<td> iEta=+45 iPhi=343 </td>
+			<td> EB+18 TT36 </td>
+			<td> <span class="caps">BPG</span>12+DPG6                               </td>
+		</tr>
+		<tr>
+			<td> 1011181487 </td>
+			<td> iEta=+75 iPhi=354 </td>
+			<td> EB+18 TT58 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011191017 </td>
+			<td> iEta=-51 iPhi= 17 </td>
+			<td> EB-1  TT44 </td>
+			<td> <span class="caps">BPG</span>6+DPG1+DPG12                          </td>
+		</tr>
+		<tr>
+			<td> 1011191501 </td>
+			<td> iEta=-76 iPhi=  1 </td>
+			<td> EB-1  TT61 </td>
+			<td> <span class="caps">BPG</span>6+DPG12                               </td>
+		</tr>
+		<tr>
+			<td> 1011191502 </td>
+			<td> iEta=-76 iPhi=  2 </td>
+			<td> EB-1  TT61 </td>
+			<td> <span class="caps">DPG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011191503 </td>
+			<td> iEta=-76 iPhi=  3 </td>
+			<td> EB-1  TT61 </td>
+			<td> <span class="caps">BPG</span>6+DPG12                               </td>
+		</tr>
+		<tr>
+			<td> 1011191504 </td>
+			<td> iEta=-76 iPhi=  4 </td>
+			<td> EB-1  TT61 </td>
+			<td> <span class="caps">DPG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011191505 </td>
+			<td> iEta=-76 iPhi=  5 </td>
+			<td> EB-1  TT61 </td>
+			<td> <span class="caps">BPG</span>6+DPG12                               </td>
+		</tr>
+		<tr>
+			<td> 1011200113 </td>
+			<td> iEta=-6 iPhi= 33 </td>
+			<td> EB-2  TT 7  </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011200626 </td>
+			<td> iEta=-32 iPhi= 26 </td>
+			<td> EB-2  TT26 </td>
+			<td> <span class="caps">VLRG</span>12+VLRG6                             </td>
+		</tr>
+		<tr>
+			<td> 1011210102 </td>
+			<td> iEta=-6 iPhi= 42 </td>
+			<td> EB-3  TT 5  </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 1011210190 </td>
+			<td> iEta=-10 iPhi= 50 </td>
+			<td> EB-3  TT 6 </td>
+			<td> <span class="caps">BPG</span>12+VLRG1+VLRG12+VLRG6                 </td>
+		</tr>
+		<tr>
+			<td> 1011211286 </td>
+			<td> iEta=-65 iPhi= 46 </td>
+			<td> EB-3  TT50 </td>
+			<td> <span class="caps">BPG</span>1                                     </td>
+		</tr>
+		<tr>
+			<td> 1011220665 </td>
+			<td> iEta=-34 iPhi= 65 </td>
+			<td> EB-4  TT25 </td>
+			<td> <span class="caps">BPG</span>12+BPG6+DPG1                          </td>
+		</tr>
+		<tr>
+			<td> 1011220965 </td>
+			<td> iEta=-49 iPhi= 65 </td>
+			<td> EB-4  TT37 </td>
+			<td> <span class="caps">BPG</span>6+DPG1+DPG12                          </td>
+		</tr>
+		<tr>
+			<td> 1011230546 </td>
+			<td> iEta=-28 iPhi= 86 </td>
+			<td> EB-5  TT22 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011231597 </td>
+			<td> iEta=-80 iPhi= 97 </td>
+			<td> EB-5  TT64 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011241053 </td>
+			<td> iEta=-53 iPhi=113 </td>
+			<td> EB-6  TT43 </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 1011250691 </td>
+			<td> iEta=-35 iPhi=131 </td>
+			<td> EB-7  TT27 </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 1011250781 </td>
+			<td> iEta=-40 iPhi=121 </td>
+			<td> EB-7  TT29 </td>
+			<td> <span class="caps">BPG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011251313 </td>
+			<td> iEta=-66 iPhi=133 </td>
+			<td> EB-7  TT55 </td>
+			<td> <span class="caps">BPG</span>12+VLRG12+VLRG6                       </td>
+		</tr>
+		<tr>
+			<td> 1011260481 </td>
+			<td> iEta=-25 iPhi=141 </td>
+			<td> EB-8  TT17 </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 1011270480 </td>
+			<td> iEta=-24 iPhi=180 </td>
+			<td> EB-9  TT20 </td>
+			<td> <span class="caps">VLRG</span>1                                    </td>
+		</tr>
+		<tr>
+			<td> 1011270749 </td>
+			<td> iEta=-38 iPhi=169 </td>
+			<td> EB-9  TT30 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011271385 </td>
+			<td> iEta=-70 iPhi=165 </td>
+			<td> EB-9  TT53 </td>
+			<td> <span class="caps">BPG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011280006 </td>
+			<td> iEta=-1 iPhi=186 </td>
+			<td> EB-10 TT 2  </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 1011280040 </td>
+			<td> iEta=-2 iPhi=200 </td>
+			<td> EB-10 TT 4  </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011280106 </td>
+			<td> iEta=-6 iPhi=186 </td>
+			<td> EB-10 TT 6  </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011280468 </td>
+			<td> iEta=-24 iPhi=188 </td>
+			<td> EB-10 TT18 </td>
+			<td> <span class="caps">VLRG</span>12+VLRG6                             </td>
+		</tr>
+		<tr>
+			<td> 1011280748 </td>
+			<td> iEta=-38 iPhi=188 </td>
+			<td> EB-10 TT30 </td>
+			<td> <span class="caps">BPG</span>12+DPG1+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011280847 </td>
+			<td> iEta=-43 iPhi=187 </td>
+			<td> EB-10 TT34 </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 1011281016 </td>
+			<td> iEta=-51 iPhi=196 </td>
+			<td> EB-10 TT44 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011281426 </td>
+			<td> iEta=-72 iPhi=186 </td>
+			<td> EB-10 TT58 </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 1011281538 </td>
+			<td> iEta=-77 iPhi=198 </td>
+			<td> EB-10 TT64 </td>
+			<td> <span class="caps">LRG</span>1+VLRG12+VLRG6                        </td>
+		</tr>
+		<tr>
+			<td> 1011281690 </td>
+			<td> iEta=-85 iPhi=190 </td>
+			<td> EB-10 TT66 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011291280 </td>
+			<td> iEta=-64 iPhi=220 </td>
+			<td> EB-11 TT52 </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 1011291281 </td>
+			<td> iEta=-65 iPhi=201 </td>
+			<td> EB-11 TT49 </td>
+			<td> <span class="caps">VLRG</span>12+VLRG6                             </td>
+		</tr>
+		<tr>
+			<td> 1011291294 </td>
+			<td> iEta=-65 iPhi=214 </td>
+			<td> EB-11 TT51 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011291456 </td>
+			<td> iEta=-73 iPhi=216 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291457 </td>
+			<td> iEta=-73 iPhi=217 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291458 </td>
+			<td> iEta=-73 iPhi=218 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291459 </td>
+			<td> iEta=-73 iPhi=219 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291460 </td>
+			<td> iEta=-73 iPhi=220 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291476 </td>
+			<td> iEta=-74 iPhi=216 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291477 </td>
+			<td> iEta=-74 iPhi=217 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291478 </td>
+			<td> iEta=-74 iPhi=218 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291479 </td>
+			<td> iEta=-74 iPhi=219 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291480 </td>
+			<td> iEta=-74 iPhi=220 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291496 </td>
+			<td> iEta=-75 iPhi=216 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291497 </td>
+			<td> iEta=-75 iPhi=217 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291498 </td>
+			<td> iEta=-75 iPhi=218 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291499 </td>
+			<td> iEta=-75 iPhi=219 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291500 </td>
+			<td> iEta=-75 iPhi=220 </td>
+			<td> EB-11 TT60 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011291597 </td>
+			<td> iEta=-80 iPhi=217 </td>
+			<td> EB-11 TT64 </td>
+			<td> <span class="caps">VLRG</span>12+VLRG6                             </td>
+		</tr>
+		<tr>
+			<td> 1011310420 </td>
+			<td> iEta=-21 iPhi=260 </td>
+			<td> EB-13 TT20 </td>
+			<td> <span class="caps">BPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011310499 </td>
+			<td> iEta=-25 iPhi=259 </td>
+			<td> EB-13 TT20 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011310585 </td>
+			<td> iEta=-30 iPhi=245 </td>
+			<td> EB-13 TT21 </td>
+			<td> <span class="caps">BPG</span>6+DPG1+DPG12                          </td>
+		</tr>
+		<tr>
+			<td> 1011311361 </td>
+			<td> iEta=-69 iPhi=241 </td>
+			<td> EB-13 TT53 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011320207 </td>
+			<td> iEta=-11 iPhi=267 </td>
+			<td> EB-14 TT10 </td>
+			<td> <span class="caps">DPG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011321154 </td>
+			<td> iEta=-58 iPhi=274 </td>
+			<td> EB-14 TT47 </td>
+			<td> <span class="caps">VLRG</span>1+VLRG12+VLRG6                       </td>
+		</tr>
+		<tr>
+			<td> 1011321157 </td>
+			<td> iEta=-58 iPhi=277 </td>
+			<td> EB-14 TT48 </td>
+			<td> <span class="caps">VLRG</span>12+VLRG6                             </td>
+		</tr>
+		<tr>
+			<td> 1011321160 </td>
+			<td> iEta=-58 iPhi=280 </td>
+			<td> EB-14 TT48 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 1011321194 </td>
+			<td> iEta=-60 iPhi=274 </td>
+			<td> EB-14 TT47 </td>
+			<td> <span class="caps">LRG</span>1+VLRG12+VLRG6                        </td>
+		</tr>
+		<tr>
+			<td> 1011330019 </td>
+			<td> iEta=-1 iPhi=299 </td>
+			<td> EB-15 TT 4  </td>
+			<td> <span class="caps">BPG</span>1                                     </td>
+		</tr>
+		<tr>
+			<td> 1011330329 </td>
+			<td> iEta=-17 iPhi=289 </td>
+			<td> EB-15 TT14 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011331127 </td>
+			<td> iEta=-57 iPhi=287 </td>
+			<td> EB-15 TT46 </td>
+			<td> <span class="caps">VLRG</span>12+VLRG6                             </td>
+		</tr>
+		<tr>
+			<td> 1011331150 </td>
+			<td> iEta=-58 iPhi=290 </td>
+			<td> EB-15 TT46 </td>
+			<td> <span class="caps">VLRG</span>1+VLRG12+VLRG6                       </td>
+		</tr>
+		<tr>
+			<td> 1011340880 </td>
+			<td> iEta=-44 iPhi=320 </td>
+			<td> EB-16 TT36 </td>
+			<td> <span class="caps">LRG</span>12+LRG6                               </td>
+		</tr>
+		<tr>
+			<td> 1011341646 </td>
+			<td> iEta=-83 iPhi=306 </td>
+			<td> EB-16 TT66 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 1011350756 </td>
+			<td> iEta=-38 iPhi=336 </td>
+			<td> EB-17 TT32 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 2010016068 </td>
+			<td> iX=+16 iY=+68 iZ=-1 </td>
+			<td> EE-2  TT15 </td>
+			<td> <span class="caps">DPG</span>6                                     </td>
+		</tr>
+		<tr>
+			<td> 2010041002 </td>
+			<td> iX=+41 iY= +2 iZ=-1 </td>
+			<td> EE-5  TT13 </td>
+			<td> <span class="caps">BPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 2010064062 </td>
+			<td> iX=+64 iY=+62 iZ=-1 </td>
+			<td> EE-8  TT18 </td>
+			<td> <span class="caps">DPG</span>1+DPG12+DPG6                          </td>
+		</tr>
+		<tr>
+			<td> 2010069046 </td>
+			<td> iX=+69 iY=+46 iZ=-1 </td>
+			<td> EE-7  TT11 </td>
+			<td> <span class="caps">BPG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 2010086047 </td>
+			<td> iX=+86 iY=+47 iZ=-1 </td>
+			<td> EE-7  TT15 </td>
+			<td> <span class="caps">BPG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 2012005048 </td>
+			<td> iX= +5 iY=+48 iZ=+1 </td>
+			<td> EE+3  TT17 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 2012006038 </td>
+			<td> iX= +6 iY=+38 iZ=+1 </td>
+			<td> EE+3  TT29 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 2012007038 </td>
+			<td> iX= +7 iY=+38 iZ=+1 </td>
+			<td> EE+3  TT29 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 2012008038 </td>
+			<td> iX= +8 iY=+38 iZ=+1 </td>
+			<td> EE+3  TT29 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 2012009038 </td>
+			<td> iX= +9 iY=+38 iZ=+1 </td>
+			<td> EE+3  TT29 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+		<tr>
+			<td> 2012010038 </td>
+			<td> iX=+10 iY=+38 iZ=+1 </td>
+			<td> EE+3  TT29 </td>
+			<td> <span class="caps">LRG</span>6+VLRG12                              </td>
+		</tr>
+		<tr>
+			<td> 2012027075 </td>
+			<td> iX=+27 iY=+75 iZ=+1 </td>
+			<td> EE+2  TT 7 </td>
+			<td> <span class="caps">BPG</span>1+LRG1                                </td>
+		</tr>
+		<tr>
+			<td> 2012041059 </td>
+			<td> iX=+41 iY=+59 iZ=+1 </td>
+			<td> EE+2  TT25 </td>
+			<td> <span class="caps">LRG</span>12                                    </td>
+		</tr>
+	</table></body>
+</html>

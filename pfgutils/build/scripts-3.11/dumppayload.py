@@ -1,4 +1,4 @@
-#!/afs/cern.ch/work/r/rgargiul/ghc-cvmfs-venv/bin/python
+#!python
 
 import sys
 
