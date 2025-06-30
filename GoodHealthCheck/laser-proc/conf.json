@@ -1,5 +1,4 @@
 {
   "Plugins_test": ["Laser3RMS"],
   "Plugins": ["Laser3RMS", "Laser3Amplitude", "Laser3AmplitudeOverPN"],
-  "ChannelsCsvPath": "/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv"
 }

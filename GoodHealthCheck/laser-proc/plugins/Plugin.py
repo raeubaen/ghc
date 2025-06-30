@@ -4,7 +4,7 @@ import json
 import cppyy
 import pandas as pd
 import numpy as np
-
+from pathlib import Path
 from json_handler import dqm_get_json
 
 palette_inverted = False
@@ -21,7 +21,8 @@ class Plugin:
 
         with open(f"{os.path.dirname(os.path.realpath(__file__))}/../conf.json", "r") as file:
           data = json.load(file)
-        self.ecal_channels_csv_path = data["ChannelsCsvPath"]
+        here = Path(__file__).resolve().parents[2]
+        self.ecal_channels_csv_path = here / "ecalchannels.csv"
 
 
     #take the json from the DQM and converting into a root object

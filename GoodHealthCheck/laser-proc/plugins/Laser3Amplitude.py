@@ -6,7 +6,7 @@ import numpy as np
 
 from Plugin import Plugin
 import ECAL
-
+from pathlib import Path
 
 import re
 
@@ -15,7 +15,10 @@ MEDIANLOW_EB = 0.1
 MEDIANUP_EE = 3
 MEDIANLOW_EE = 0.003
 
-ECAL_CSV = '/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/ecalchannels.csv'
+
+here = Path(__file__).resolve().parents[2]
+
+ECAL_CSV = here / "ecalchannels.csv"
 
 
 def read_hist_EB(one_run_root_object, supermodule, Ichannels, Lchannels, ecal):
@@ -203,7 +206,7 @@ class Laser3Amplitude(Plugin):
         run_df["ieta_iy"] = run_df["ieta_iy"].astype(int)
         run_df["detector_priority"] = run_df["detector"].map({"EB": 0, "EE": 1})
         run_df = run_df.sort_values(by=["detector_priority", "sm_ch", "iphi_ix", "ieta_iy"]).drop(columns=["detector_priority", "detector", "sm_ch", "iphi_ix", "ieta_iy"])
-        run_df.to_csv(f'/afs/cern.ch/user/c/charlesf/ghc/GoodHealthCheck/laser-proc/output/LT_Amp_{run_info["run"]}.csv', index = False) 
+        run_df.to_csv(f'{here}/laser-proc/output/LT_Amp_{run_info["run"]}.csv', index = False) 
         #fill _data inside generic Plugin class
         self.fill_data_one_run(run_info, run_dict)
 
