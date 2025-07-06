@@ -80,7 +80,8 @@ The following rules are used for assign some flags to channels:
 How to use
 ==========
 
-** Setup ** 
+**Setup**
+
   source /cvmfs/sft.cern.ch/lcg/views/LCG_106/x86_64-el9-gcc13-opt/setup.sh
 
   cd pfgutils
@@ -89,6 +90,7 @@ How to use
   ssh -o ExitOnForwardFailure=yes -f -N -L 10121:cmsonr1-v.cern.ch:10121 USERNAME@cmsusr.cern.ch 
 
 **Example of analyse GHC1**
+
     cd GoodHealthCheck
     python ghc.py -h
     python ghc.py --csv -o "results" -pon "392414" -poff "390112" -tp "392424" -l "392430" 1 |& tee ghc.log
