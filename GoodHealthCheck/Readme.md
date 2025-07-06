@@ -80,16 +80,25 @@ The following rules are used for assign some flags to channels:
 How to use
 ==========
 
+    source /cvmfs/sft.cern.ch/lcg/views/LCG_106/x86_64-el9-gcc13-opt/setup.sh
+
 **Setup**
 
-  source /cvmfs/sft.cern.ch/lcg/views/LCG_106/x86_64-el9-gcc13-opt/setup.sh
+  On top of:
+  
+    source /cvmfs/sft.cern.ch/lcg/views/LCG_106/x86_64-el9-gcc13-opt/setup.sh
 
-  cd pfgutils
-  pip install -e .
+  create a cmvfs-venv environment using: https://github.com/matthewfeickert/cvmfs-venv, activate it and install psycopg2, then:
+  
+    cd pfgutils
+    pip install -e .
 
-  ssh -o ExitOnForwardFailure=yes -f -N -L 10121:cmsonr1-v.cern.ch:10121 USERNAME@cmsusr.cern.ch 
+  At this point everytime the code has to be run, one only has to source the view setup.sh, activate the environment and run:
+  
+    ssh -o ExitOnForwardFailure=yes -f -N -L 10121:cmsonr1-v.cern.ch:10121 USERNAME@cmsusr.cern.ch 
 
-**Example of analyse GHC1**
+
+**Example**
 
     cd GoodHealthCheck
     python ghc.py -h
