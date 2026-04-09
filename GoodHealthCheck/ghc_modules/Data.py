@@ -545,7 +545,7 @@ class Data(object):
       laser or pedestal HV OFF channels
     """
     if self.isClassified:
-      # logger.debug("Already classified.")
+      logger.info("Already classified.")
       return
     logger.info("Performing channel classification")
     logger.info("Classify Pedestal HV ON data ...")

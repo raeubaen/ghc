@@ -54,8 +54,9 @@ df_both = pd.merge(df_both, df_value, on=merge_keys, suffixes=('_status', "_valu
 df_only_values = pd.merge(only_values[merge_keys], df_value, on=merge_keys)
 df_only_status = pd.merge(only_status[merge_keys], df_status, on=merge_keys)
 
-print("Both\n", len(df_both), "\n", df_both, "\n\n")
+#print("Both\n", len(df_both), "\n", df_both, "\n\n")
+#print("only DQM ch. status\n", len(df_only_status), "\n", df_only_status, "\n\n")
+
 print("only GHC\n", len(df_only_values), "\n", df_only_values, "\n\n")
-print("only DQM ch. status\n", len(df_only_status), "\n", df_only_status, "\n\n")
 
-
+df_only_values.apply(lambda row: print(f"{{'x_phi':{row.x_phi},'y_eta':{row.y_eta},'SM':'{row.label}'}}, ", end=""), axis=1)

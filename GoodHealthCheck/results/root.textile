@@ -24,24 +24,6 @@ h3. pedestals_hvoff ROOT files
 
 h3. testpulse ROOT files
 
-"G12_MEAN.2D.root":testpulse/G12_MEAN.2D.root
-"G12_MEAN_EB.1D.root":testpulse/G12_MEAN_EB.1D.root
-"G12_MEAN_EE.1D.root":testpulse/G12_MEAN_EE.1D.root
-"G12_RMS.2D.root":testpulse/G12_RMS.2D.root
-"G12_RMS_EB.1D.root":testpulse/G12_RMS_EB.1D.root
-"G12_RMS_EE.1D.root":testpulse/G12_RMS_EE.1D.root
-"G1_MEAN.2D.root":testpulse/G1_MEAN.2D.root
-"G1_MEAN_EB.1D.root":testpulse/G1_MEAN_EB.1D.root
-"G1_MEAN_EE.1D.root":testpulse/G1_MEAN_EE.1D.root
-"G1_RMS.2D.root":testpulse/G1_RMS.2D.root
-"G1_RMS_EB.1D.root":testpulse/G1_RMS_EB.1D.root
-"G1_RMS_EE.1D.root":testpulse/G1_RMS_EE.1D.root
-"G6_MEAN.2D.root":testpulse/G6_MEAN.2D.root
-"G6_MEAN_EB.1D.root":testpulse/G6_MEAN_EB.1D.root
-"G6_MEAN_EE.1D.root":testpulse/G6_MEAN_EE.1D.root
-"G6_RMS.2D.root":testpulse/G6_RMS.2D.root
-"G6_RMS_EB.1D.root":testpulse/G6_RMS_EB.1D.root
-"G6_RMS_EE.1D.root":testpulse/G6_RMS_EE.1D.root
 
 h3. laser ROOT files
 
